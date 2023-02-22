@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          BigInt    @id
+  username    String    @unique
+  passhash    Bytes
+  avatar      String?
+  color       String?
+  sessions    Session[]
+  joinedRooms Room[]    @relation("RoomMember")
+  ownsRooms   Room[]    @relation("RoomOwner")
+  messages    Message[]
+}
+
+model Session {
+  id        BigInt   @id
+  token     String   @unique
+  user      User     @relation(fields: [userID], references: [id])
+  userID    BigInt
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}
+
+model Room {
+  id        BigInt    @id
+  name      String    @unique
+  owner     User      @relation("RoomOwner", fields: [ownerID], references: [id])
+  ownerID   BigInt
+  members   User[]    @relation("RoomMember")
+  createdAt DateTime  @default(now())
+  topic     String?
+  avatar    String?
+  color     String?
+  messages  Message[]
+}
+
+model Message {
+  id        BigInt   @id
+  room      Room     @relation(fields: [roomID], references: [id])
+  roomID    BigInt
+  author    User     @relation(fields: [authorID], references: [id])
+  authorID  BigInt
+  createdAt DateTime @default(now())
+  content   Json
+  embeds    Json
+}

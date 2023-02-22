@@ -1,0 +1,27 @@
+{
+  "name": "chatter",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev --experimental-static-build",
+    "build": "astro build --experimental-static-build",
+    "prisma": "prisma format --schema ./src/lib/db/schema.prisma && prisma generate --schema ./src/lib/db/schema.prisma"
+  },
+  "dependencies": {
+    "@prisma/client": "^4.10.1",
+    "bcryptjs": "^2.4.3",
+    "simpleflakes": "^2.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^18.14.0",
+    "astro": "^2.0.14",
+    "prisma": "^4.10.1"
+  },
+  "imports": {
+    "#lib/*/": "./src/lib/*/index.js",
+    "#lib/*.ts": "./src/lib/*.js",
+    "#lib/*.js": "./src/lib/*.js",
+    "#pages/*.astro": "./src/pages/*.astro",
+    "#components/*.astro": "./src/components/*.astro"
+  }
+}
