@@ -5,17 +5,19 @@
   "scripts": {
     "dev": "astro dev --experimental-static-build",
     "build": "astro build --experimental-static-build",
-    "prisma": "prisma format --schema ./src/lib/db/schema.prisma && prisma generate --schema ./src/lib/db/schema.prisma"
+    "prisma": "prisma format --schema ./src/lib/db/schema.prisma && prisma generate --schema ./src/lib/db/schema.prisma",
+    "prisma-migrate": "prisma migrate deploy --schema ./src/lib/db/schema.prisma"
   },
   "dependencies": {
-    "@prisma/client": "^4.10.1",
+    "@prisma/client": "^4.2.1",
     "bcryptjs": "^2.4.3",
     "simpleflakes": "^2.2.2"
   },
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.0.1",
     "@types/node": "^18.14.0",
     "astro": "^2.0.14",
-    "prisma": "^4.10.1"
+    "prisma": "^4.2.1"
   },
   "imports": {
     "#lib/*/": "./src/lib/*/index.js",

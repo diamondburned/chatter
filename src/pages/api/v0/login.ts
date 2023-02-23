@@ -1,6 +1,6 @@
 import * as astro from "astro";
-import * as api from "#lib/api/";
-import * as db from "#lib/db/";
+import * as api from "#lib/api/index.js";
+import * as db from "#lib/db/index.js";
 
 export async function post(ctx: astro.APIContext): Promise<Response> {
   try {
@@ -10,7 +10,7 @@ export async function post(ctx: astro.APIContext): Promise<Response> {
       where: { username: body.username },
     });
 
-    const correct = await db.comparePassword(user, body.password);
+    const correct = await db.comparePassword(user.passhash, body.password);
     if (!correct) {
       throw new Error("Invalid username or password");
     }

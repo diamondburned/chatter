@@ -1,7 +1,7 @@
 import * as prisma from "@prisma/client";
 import * as bcrypt from "bcryptjs";
 import * as crypto from "crypto";
-import * as api from "#lib/api/";
+import * as api from "#lib/api/index.js";
 import { simpleflake } from "simpleflakes";
 
 export { Prisma } from "@prisma/client";
@@ -46,9 +46,13 @@ export async function createSession(
 // authorize checks the session token and returns the session object if the
 // session is valid.
 export async function authorize(request: Request): Promise<prisma.Session> {
+  if (!request.headers.get("Authorization")) {
+    throw new Error("missing Authorization header");
+  }
+
   const oldSession = await client.session.findFirstOrThrow({
     where: {
-      token: request.headers.get("Athorization"),
+      token: request.headers.get("Authorization"),
       expiresAt: { gt: new Date() },
     },
   });

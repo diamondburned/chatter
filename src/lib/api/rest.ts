@@ -1,9 +1,11 @@
-import * as api from "#lib/api/";
+import * as api from "#lib/api/index.js";
 
 // respondError is a helper function to respond with an error.
 export function respondError(code: number, why: any, message = ""): Response {
+  const whyString =
+    why instanceof Error ? why.message.replace("Error: ", "") : `${why}`;
   const body: api.ErrorResponse = {
-    error: message ? `${message}: ${why}` : `${why}`,
+    error: message ? `${message}: ${whyString}` : whyString,
   };
   return new Response(JSON.stringify(body), { status: code });
 }

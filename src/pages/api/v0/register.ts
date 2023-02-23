@@ -1,13 +1,13 @@
 import * as astro from "astro";
-import * as api from "#lib/api/";
-import * as db from "#lib/db/";
+import * as api from "#lib/api/index.js";
+import * as db from "#lib/db/index.js";
 
 const allowRegistration = true;
 let registrationSecret: Buffer | undefined;
 
 if (process.env["REGISTRATION_SECRET"]) {
   db.hashPassword(process.env["REGISTRATION_SECRET"]).then((hash) => {
-    registrationSecret = new Buffer(hash);
+    registrationSecret = Buffer.from(hash);
   });
 }
 
@@ -39,7 +39,7 @@ export async function post(ctx: astro.APIContext): Promise<Response> {
       data: {
         id: db.newID(),
         username: body.username,
-        passhash: new Buffer(await db.hashPassword(body.password)),
+        passhash: Buffer.from(await db.hashPassword(body.password)),
       },
     });
   } catch (err) {
