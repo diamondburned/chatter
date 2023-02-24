@@ -1,5 +1,5 @@
 // Timestamp is an RFC3339 timestamp string.
-export type Timestamp = `${string}T${string}Z`;
+export type Timestamp = `${string}T${string}`;
 
 // DateToTimestamp converts a Date to a Timestamp.
 export function DateToTimestamp(d: Date): Timestamp {
@@ -20,8 +20,12 @@ export type Color = `#${string}`;
 export type User = {
   id: string;
   username: string;
-  avatar: Resource;
-  color: Color;
+  attributes: Partial<{
+    avatar: Resource;
+    color: Color;
+    socials: Record<string, string>;
+    [key: string]: any;
+  }>;
 };
 
 // Me is the current user.
@@ -36,42 +40,37 @@ export type Room = {
   name: string;
   owner: User;
   createdAt: Timestamp;
-  topic?: string;
-  avatar?: Resource;
-  color?: Color;
+  attributes?: Partial<{
+    topic: string;
+    color: Color;
+    avatar: Resource;
+    [key: string]: any;
+  }>;
 };
 
 // RoomEventType is a generic type that describes a room event.
-export type RoomEventType<EventType, T> = T & {
+export type RoomEventType<EventType, T> = {
   readonly type: EventType;
+  id: string;
   roomID: string;
-  event: T;
+  author: User;
+  createdAt: Timestamp;
+  content: T;
 };
-
-// PartialWithID is a partial type with an ID. It makes all fields of T optional
-// except for the ID.
-export type PartialWithID<T extends { id: string }> = Partial<T> &
-  Pick<T, "id">;
 
 // RoomEvent describes a room event. A room event is immutable with the
 // exception of update and delete events. Note that the client may or may not
 // obey updates and deletes.
 export type RoomEvent =
-  | RoomEventType<"create", Omit<Room, "id">>
-  | RoomEventType<"update", Partial<Omit<Room, "id">>>
-  | RoomEventType<"message_create", Message>
-  | RoomEventType<"message_update", PartialWithID<Message>>
+  | RoomEventType<"update_room", Partial<Room>>
+  | RoomEventType<"message_create", MessageContent>
+  | RoomEventType<"message_update", Partial<MessageContent>>
   | RoomEventType<"message_delete", { id: string }>;
 
-// Message represents a chat message.
-export type Message = {
-  id: string;
-  author: User;
-  createdAt: Timestamp;
-  content: {
-    markdown?: string;
-  };
-  embeds?: Record<
+// MessageContent describes the content of a message.
+export type MessageContent = Partial<{
+  markdown: string;
+  embeds: Record<
     string,
     {
       url: string;
@@ -80,7 +79,8 @@ export type Message = {
       thumbnail?: Resource;
     }
   >;
-};
+  [key: string]: any;
+}>;
 
 const txtenc = new TextEncoder();
 
