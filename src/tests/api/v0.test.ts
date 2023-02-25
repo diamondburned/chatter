@@ -28,7 +28,7 @@ describe("api/v0", () => {
         }
       );
     } catch (err) {
-      console.log("cannot register, continuing anyway...", err);
+      // console.debug("cannot register, continuing anyway...", err);
     }
   });
 
@@ -47,7 +47,7 @@ describe("api/v0", () => {
   it("sync", async () => {
     const sync = await tester.get<api.SyncResponse>("/api/v0/sync", {});
     lastAck = sync.ack;
-    console.log(`synced to ${sync.ack}:`, sync);
+    // console.debug(`synced to ${sync.ack}:`, sync);
   });
 
   it("delete existing room", async () => {
@@ -60,7 +60,7 @@ describe("api/v0", () => {
       return;
     }
 
-    console.log("deleting existing test room", testRoom);
+    // console.debug("deleting existing test room", testRoom);
 
     await tester.delete<api.DeleteRoomRequest, api.DeleteRoomResponse>(
       `/api/v0/rooms/${testRoom.id}`,
@@ -91,7 +91,7 @@ describe("api/v0", () => {
       lastAck,
     });
     lastAck = sync.ack;
-    console.log(`synced to ${sync.ack}:`, sync);
+    // console.debug(`synced to ${sync.ack}:`, sync);
 
     assertEq(sync.events.length, 1);
 
@@ -122,7 +122,7 @@ describe("api/v0", () => {
       lastAck,
     });
     lastAck = sync.ack;
-    console.log(`synced to ${sync.ack}:`, sync);
+    // console.debug(`synced to ${sync.ack}:`, sync);
 
     assertEq(sync.events.length, 1);
     assertEq(sync.events[0].id, ourMessageID);
@@ -134,7 +134,7 @@ describe("api/v0", () => {
       `/api/v0/rooms/${ourRoomID}/events`,
       {}
     );
-    console.log("got these events after sending message:", list);
+    // console.debug("got these events after sending message:", list);
 
     assert(list.length > 0);
     assert(list.find((e) => e.id == ourMessageID));
@@ -155,7 +155,7 @@ describe("api/v0", () => {
       lastAck,
     });
     lastAck = sync.ack;
-    console.log(`synced to ${sync.ack}:`, sync);
+    // console.debug(`synced to ${sync.ack}:`, sync);
 
     assert(!sync.events.length);
     assert(!sync.me.ownsRooms.find((r) => r.id == ourRoomID));

@@ -7,13 +7,11 @@
     "build": "astro build --experimental-static-build",
     "prisma": "prisma format --schema ./src/lib/db/schema.prisma && prisma generate --schema ./src/lib/db/schema.prisma",
     "prisma-reset-prod": "prisma db push --schema ./src/lib/db/schema.prisma",
-    "test": "vitest"
+    "test": "vitest --run"
   },
   "dependencies": {
     "@prisma/client": "^4.2.1",
     "bcryptjs": "^2.4.3",
-    "simpleflakes": "^2.2.2",
-    "ts-node": "^10.9.1",
     "ulid": "^2.3.0"
   },
   "devDependencies": {
@@ -21,7 +19,8 @@
     "@types/node": "^18.14.0",
     "astro": "^2.0.14",
     "prisma": "^4.2.1",
-    "vitest": "^0.28.5"
+    "vitest": "^0.28.5",
+    "ts-node": "^10.9.1"
   },
   "imports": {
     "#lib/*/": "./src/lib/*/index.js",
