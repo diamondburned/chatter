@@ -1,8 +1,10 @@
 import * as prisma from "@prisma/client";
 import * as bcrypt from "bcryptjs";
 import * as crypto from "crypto";
+import * as ulid from "ulid";
 import * as api from "#lib/api/index.js";
-import { simpleflake } from "simpleflakes";
+import assert from "assert";
+import { simpleflake, parseSimpleflake } from "simpleflakes";
 
 export { Prisma } from "@prisma/client";
 export { prisma };
@@ -20,8 +22,8 @@ export async function hashPassword(password: string): Promise<string> {
 }
 
 // newID generates a new ID.
-export function newID(t = Date.now()): bigint {
-  return simpleflake(t);
+export function newID(t?: number): string {
+  return ulid.ulid(t);
 }
 
 // SessionMaxAge is the maximum age of a session in milliseconds.
@@ -37,7 +39,6 @@ export async function createSession(
       id: newID(),
       token: crypto.randomBytes(24).toString("base64"),
       userID: user.id,
-      createdAt: new Date(),
       expiresAt: new Date(Date.now() + SessionMaxAge),
     },
   });
@@ -61,4 +62,73 @@ export async function authorize(request: Request): Promise<prisma.Session> {
     where: { id: oldSession.id },
     data: { expiresAt: new Date(Date.now() + SessionMaxAge) },
   });
+}
+
+// joinRoom tacks the user into the room if they're not already in it.
+// This function will emit a join event if the user is not already in the room.
+export async function joinRoom(session: prisma.Session, roomID: string) {
+  const where = { roomID_userID: { userID: session.userID, roomID } };
+
+  try {
+    // Fast path by just checking if the user is in the room.
+    const member = await client.roomMember.findUnique({ where });
+    if (member) {
+      return;
+    }
+
+    await client.$transaction([
+      client.roomMember.create({
+        data: {
+          roomID: roomID,
+          userID: session.userID,
+        },
+      }),
+      client.event.create({
+        data: {
+          id: newID(),
+          type: "member_join",
+          roomID: roomID,
+          authorID: session.userID,
+        },
+      }),
+    ]);
+  } catch (err) {
+    if (err.code === "P2034" || err.code === "P2002") {
+      // Ignore duplicate key error.
+      return;
+    }
+    throw err; // pretty bad
+  }
+}
+
+export function convertUser(user: prisma.User): api.User {
+  return {
+    id: user.id.toString(),
+    username: user.username,
+    attributes: user.attributes as api.User["attributes"],
+  };
+}
+
+export function convertRoom(room: prisma.Room, owner: prisma.User): api.Room {
+  assert(room.ownerID === owner.id);
+  return {
+    id: room.id.toString(),
+    name: room.name,
+    owner: convertUser(owner),
+    attributes: room.attributes as api.Room["attributes"],
+  };
+}
+
+export function convertEvent(
+  event: prisma.Event,
+  author: prisma.User
+): api.RoomEvent {
+  assert(event.authorID === author.id);
+  return {
+    id: event.id.toString(),
+    type: event.type as api.RoomEvent["type"],
+    roomID: event.roomID.toString(),
+    author: convertUser(author),
+    content: event.content as api.RoomEvent["content"],
+  } as api.RoomEvent;
 }

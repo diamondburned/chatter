@@ -27,6 +27,9 @@ in pkgs.mkShell (with pkgs; {
 		PATH="$PWD/node_modules/.bin:$PATH"
 	'';
 
+	TESTING_API = "localhost:3000";
+	REGISTRATION_SECRET = "Kecef7aifieHah6or4UViifi5ri1Chae5LaTaekoo3chie1aik";
+
 	PRISMA_MIGRATION_ENGINE_BINARY = "${prisma-engines}/bin/migration-engine";
 	PRISMA_QUERY_ENGINE_BINARY = "${prisma-engines}/bin/query-engine";
 	PRISMA_QUERY_ENGINE_LIBRARY = "${prisma-engines}/lib/libquery_engine.node";

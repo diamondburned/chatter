@@ -1,7 +1,10 @@
 import * as api from "#lib/api/index.js";
+import * as astro from "astro";
 
 // respondError is a helper function to respond with an error.
 export function respondError(code: number, why: any, message = ""): Response {
+  console.debug("request failed: " + message, why);
+
   const errstr = fmterr(why);
   const body: api.ErrorResponse = {
     error: message ? `${message}: ${errstr}` : errstr,
@@ -72,7 +75,6 @@ export type LoginResponse = FailableResponse<{
   id: string;
   token: string;
   userID: string;
-  createdAt: api.Timestamp;
   expiresAt: api.Timestamp;
 }>;
 
@@ -85,19 +87,16 @@ export type RegisterRequest = {
 // RegisterResponse is the same as LoginResponse.
 export type RegisterResponse = FailableResponse<LoginResponse>;
 
-// SendMessageRequest is a request to send a message.
-export type SendMessageRequest = api.MessageContent;
+// SendEventRequest is a request to send a message.
+export type SendEventRequest = Pick<api.RoomEvent, "type" | "content">;
 
 // SendMessageResponse is the response to a send message request.
-export type SendMessageResponse = FailableResponse<
-  Extract<api.RoomEvent, { type: "message_create" }>
->;
+export type SendEventResponse = FailableResponse<api.RoomEvent>;
 
 // RoomEventsRequest is a request to get messages. If before is not specified,
 // the most recent messages are returned, otherwise the messages before the
 // message with the specified ID are returned.
 export type RoomEventsRequest = {
-  roomID: string;
   before?: string; // Message ID
   limit?: number; // max 100, default 100
 };
@@ -109,20 +108,10 @@ export type RoomEventsResponse = FailableResponse<
 >;
 
 // RoomRequest is a request to get a room.
-export type RoomRequest = {
-  roomID: string;
-};
+export type RoomRequest = {};
 
 // RoomResponse is the response to a room request.
 export type RoomResponse = FailableResponse<api.Room>;
-
-// JoinRoomRequest is a request to join a room.
-export type JoinRoomRequest = {
-  roomID: string;
-};
-
-// JoinRoomResponse is the response to a join room request.
-export type JoinRoomResponse = FailableResponse<{}>;
 
 // CreateRoomRequest is a request to create a room.
 export type CreateRoomRequest = Omit<api.Room, "id" | "owner" | "createdAt">;
@@ -131,16 +120,15 @@ export type CreateRoomRequest = Omit<api.Room, "id" | "owner" | "createdAt">;
 export type CreateRoomResponse = FailableResponse<api.Room>;
 
 // UpdateRoomRequest is a request to update a room.
-export type UpdateRoomRequest = Pick<api.Room, "id"> &
-  Partial<Omit<api.Room, "owner" | "createdAt">>;
+export type UpdateRoomRequest = Partial<
+  Omit<api.Room, "id" | "owner" | "createdAt">
+>;
 
 // UpdateRoomResponse is the response to an update room request.
 export type UpdateRoomResponse = FailableResponse<api.Room>;
 
 // DeleteRoomRequest is a request to delete a room.
-export type DeleteRoomRequest = {
-  roomID: string;
-};
+export type DeleteRoomRequest = {};
 
 // DeleteRoomResponse is the response to a delete room request.
 export type DeleteRoomResponse = FailableResponse<{}>;
@@ -150,6 +138,7 @@ export type ListRoomsRequest = {
   query?: string;
   limit?: number; // max 100, default 100
   before?: string;
+  ownerID?: string;
 };
 
 // ListRoomsResponse is the response to a list rooms request.
@@ -160,16 +149,16 @@ export type ListRoomsResponse = FailableResponse<{
 
 // SyncRequest is a request to sync the client with the server.
 export type SyncRequest = {
-  // lastSync is the last sync time that the client received from a
+  // lastAck is the last ack time that the client received from a
   // SyncResponse. If the client has never synced, this should be null.
-  lastSync: api.Timestamp | null;
+  lastAck: string | null;
 };
 
 // SyncResponse is the response to a sync request.
 export type SyncResponse = FailableResponse<{
-  // ackTimestamp is returned to the client to acknowledge the sync. The client
-  // should send this timestamp in the next sync request.
-  ackTimestamp: api.Timestamp;
+  // ack is returned to the client to acknowledge the sync. The client should
+  // send this timestamp in the next sync request.
+  ack: string;
   // me is the current user.
   me: api.Me;
   // events is the list of new events that correspond to the rooms the user is

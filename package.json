@@ -6,13 +6,15 @@
     "dev": "astro dev --experimental-static-build",
     "build": "astro build --experimental-static-build",
     "prisma": "prisma format --schema ./src/lib/db/schema.prisma && prisma generate --schema ./src/lib/db/schema.prisma",
-    "prisma-reset-prod": "prisma db push --schema ./src/lib/db/schema.prisma"
+    "prisma-reset-prod": "prisma db push --schema ./src/lib/db/schema.prisma",
+    "test": "vitest"
   },
   "dependencies": {
     "@prisma/client": "^4.2.1",
     "bcryptjs": "^2.4.3",
     "simpleflakes": "^2.2.2",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "ulid": "^2.3.0"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.0.1",

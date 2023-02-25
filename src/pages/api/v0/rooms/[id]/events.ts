@@ -13,41 +13,38 @@ export async function get(ctx: astro.APIContext): Promise<Response> {
   }
 
   try {
-    const body: api.ListRoomsRequest = {
+    const roomID = ctx.params.id;
+    const body: api.RoomEventsRequest = {
       limit: api.scanURLParam(url, "limit"),
-      query: api.scanURLParam(url, "query"),
       before: api.scanURLParam(url, "before"),
-      ownerID: api.scanURLParam(url, "ownerID"),
     };
+
+    await db.joinRoom(session, roomID);
 
     const limit = body.limit ? Math.min(body.limit, 100) : 100;
 
-    const rooms = await db.client.room.findMany({
-      where: {
-        AND: {
-          name: body.query
-            ? { contains: body.query, mode: "insensitive" }
-            : undefined,
-          ownerID: body.ownerID ? body.ownerID : undefined,
-        },
-      },
-      include: {
-        owner: true,
-      },
+    const events = await db.client.event.findMany({
+      where: { roomID },
+      include: { author: true },
       take: limit,
       cursor: body.before ? { id: body.before } : undefined,
     });
 
-    const resp: api.ListRoomsResponse = {
-      rooms: rooms.map((r) => db.convertRoom(r, r.owner)),
-      hasMore: rooms.length === limit,
-    };
+    const resp: api.RoomEventsResponse = events.map((ev) =>
+      db.convertEvent(ev, ev.author)
+    );
 
     return api.respond(resp);
   } catch (err) {
     return api.respondError(400, err);
   }
 }
+
+const allowedEvents = new Set([
+  "message_create",
+  "message_update",
+  "message_delete",
+]);
 
 export async function post(ctx: astro.APIContext): Promise<Response> {
   let session: db.prisma.Session;
@@ -58,25 +55,29 @@ export async function post(ctx: astro.APIContext): Promise<Response> {
   }
 
   try {
-    const body: api.CreateRoomRequest = await ctx.request.json();
+    const roomID = ctx.params.id;
+    const body: api.SendEventRequest = await ctx.request.json();
 
-    const room = await db.client.room.create({
+    if (!allowedEvents.has(body.type)) {
+      throw new Error("invalid event type");
+    }
+
+    await db.joinRoom(session, roomID);
+
+    const event = await db.client.event.create({
       data: {
         id: db.newID(),
-        name: body.name,
-        owner: {
-          connect: { id: session.userID },
-        },
-        attributes: body.attributes,
+        type: body.type,
+        roomID: roomID,
+        authorID: session.userID,
+        content: body.content,
       },
       include: {
-        owner: true,
+        author: true,
       },
     });
 
-    await db.joinRoom(session, room.id);
-
-    const resp: api.CreateRoomResponse = db.convertRoom(room, room.owner);
+    const resp: api.SendEventResponse = db.convertEvent(event, event.author);
 
     return api.respond(resp);
   } catch (err) {

@@ -22,7 +22,6 @@ export async function post(ctx: astro.APIContext): Promise<Response> {
         id: session.id.toString(),
         userID: session.userID.toString(),
         token: session.token,
-        createdAt: session.createdAt.toISOString() as api.Timestamp,
         expiresAt: session.expiresAt.toISOString() as api.Timestamp,
       };
     } catch (err) {

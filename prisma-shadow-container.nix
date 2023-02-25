@@ -17,8 +17,7 @@
 	};
 
 	environment.sessionVariables = rec {
-		DATABASE_URL = "postgresql://root@127.0.0.1:5432/shadow?schema=public";
-		SHADOW_DATABASE_URL = DATABASE_URL;
+		SHADOW_DATABASE_URL = "postgresql://root@127.0.0.1:5432/shadow?schema=public";
 	};
 }
 

@@ -3,12 +3,12 @@ import * as api from "#lib/api/index.js";
 import * as db from "#lib/db/index.js";
 
 const allowRegistration = true;
-let registrationSecret: Buffer | undefined;
+let registrationSecret: Promise<Buffer> | undefined;
 
 if (process.env["REGISTRATION_SECRET"]) {
-  db.hashPassword(process.env["REGISTRATION_SECRET"]).then((hash) => {
-    registrationSecret = Buffer.from(hash);
-  });
+  registrationSecret = db
+    .hashPassword(process.env["REGISTRATION_SECRET"])
+    .then((hash) => Buffer.from(hash));
 }
 
 export async function post(ctx: astro.APIContext): Promise<Response> {
@@ -25,9 +25,10 @@ export async function post(ctx: astro.APIContext): Promise<Response> {
   }
 
   if (registrationSecret) {
+    const secret = ctx.request.headers.get("X-Registration-Secret");
     if (
-      !body.secret ||
-      !(await db.comparePassword(registrationSecret, body.secret))
+      !secret ||
+      !(await db.comparePassword(await registrationSecret, secret))
     ) {
       return api.respondError(403, "Not authorized");
     }
@@ -40,6 +41,7 @@ export async function post(ctx: astro.APIContext): Promise<Response> {
         id: db.newID(),
         username: body.username,
         passhash: Buffer.from(await db.hashPassword(body.password)),
+        attributes: {},
       },
     });
   } catch (err) {
@@ -53,7 +55,6 @@ export async function post(ctx: astro.APIContext): Promise<Response> {
       id: session.id.toString(),
       userID: session.userID.toString(),
       token: session.token,
-      createdAt: session.createdAt.toISOString() as api.Timestamp,
       expiresAt: session.expiresAt.toISOString() as api.Timestamp,
     };
   } catch (err) {

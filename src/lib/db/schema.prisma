@@ -9,46 +9,60 @@ datasource db {
 }
 
 model User {
-  id          BigInt    @id
-  username    String    @unique
+  id          String       @id
+  username    String       @unique
   passhash    Bytes
-  avatar      String?
-  color       String?
   sessions    Session[]
-  joinedRooms Room[]    @relation("RoomMember")
-  ownsRooms   Room[]    @relation("RoomOwner")
-  messages    Message[]
+  joinedRooms RoomMember[] @relation("UserMember")
+  ownsRooms   Room[]       @relation("RoomOwner")
+  events      Event[]
+  attributes  Json         @default("{}")
 }
 
 model Session {
-  id        BigInt   @id
+  id        String   @id
   token     String   @unique
-  user      User     @relation(fields: [userID], references: [id])
-  userID    BigInt
-  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userID], references: [id], onDelete: Cascade)
+  userID    String
   expiresAt DateTime
 }
 
 model Room {
-  id        BigInt    @id
-  name      String    @unique
-  owner     User      @relation("RoomOwner", fields: [ownerID], references: [id])
-  ownerID   BigInt
-  members   User[]    @relation("RoomMember")
-  createdAt DateTime  @default(now())
-  topic     String?
-  avatar    String?
-  color     String?
-  messages  Message[]
+  id         String       @id
+  name       String       @unique
+  owner      User         @relation("RoomOwner", fields: [ownerID], references: [id], onDelete: Cascade)
+  ownerID    String
+  members    RoomMember[] @relation("RoomMember")
+  events     Event[]
+  attributes Json         @default("{}")
 }
 
-model Message {
-  id        BigInt   @id
-  room      Room     @relation(fields: [roomID], references: [id])
-  roomID    BigInt
-  author    User     @relation(fields: [authorID], references: [id])
-  authorID  BigInt
-  createdAt DateTime @default(now())
-  content   Json
-  embeds    Json
+model RoomMember {
+  room     Room     @relation("RoomMember", fields: [roomID], references: [id], onDelete: Cascade)
+  roomID   String
+  user     User     @relation("UserMember", fields: [userID], references: [id], onDelete: Cascade)
+  userID   String
+  joinedAt DateTime @default(now())
+
+  @@id([roomID, userID])
+}
+
+model Event {
+  id       String    @id
+  type     EventType
+  room     Room      @relation(fields: [roomID], references: [id], onDelete: Cascade)
+  roomID   String
+  author   User?     @relation(fields: [authorID], references: [id])
+  authorID String?
+  content  Json      @default("{}")
+}
+
+enum EventType {
+  create_room
+  update_room
+  message_create
+  message_update
+  message_delete
+  member_join
+  member_leave
 }

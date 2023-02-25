@@ -39,7 +39,6 @@ export type Room = {
   id: string;
   name: string;
   owner: User;
-  createdAt: Timestamp;
   attributes?: Partial<{
     topic: string;
     color: Color;
@@ -54,7 +53,6 @@ export type RoomEventType<EventType, T> = {
   id: string;
   roomID: string;
   author: User;
-  createdAt: Timestamp;
   content: T;
 };
 
@@ -63,6 +61,8 @@ export type RoomEventType<EventType, T> = {
 // obey updates and deletes.
 export type RoomEvent =
   | RoomEventType<"update_room", Partial<Room>>
+  | RoomEventType<"member_join", User>
+  | RoomEventType<"member_leave", { id: string }>
   | RoomEventType<"message_create", MessageContent>
   | RoomEventType<"message_update", Partial<MessageContent>>
   | RoomEventType<"message_delete", { id: string }>;

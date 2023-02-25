@@ -10,7 +10,16 @@ export class APITester {
   headers = new Headers();
 
   constructor(urlstr: string) {
+    if (!urlstr.match(/^https?:\/\//)) {
+      urlstr = "http://" + urlstr;
+    }
+
     this.url = new URL(urlstr);
+
+    // This doesn't work for some reason. What the heck, JavaScript?
+    // if (this.url.protocol == "") {
+    //   this.url.protocol = "http";
+    // }
   }
 
   get<T extends api.ErrorResponse | any>(
@@ -85,11 +94,11 @@ export class APITester {
     method: string,
     path: string,
     params: Record<string, string>,
-    requestBody: any,
+    requestBody: any | undefined,
     expect: T | undefined,
     expectError: boolean
   ): Promise<T | api.ErrorResponse> {
-    const url = { ...this.url };
+    const url = new URL(this.url);
     url.pathname = path;
 
     if (params) {
@@ -97,14 +106,14 @@ export class APITester {
       url.search = searchParams.toString();
     }
 
-    const resp = await fetch(path, {
-      body: JSON.stringify(requestBody),
+    const resp = await fetch(url.toString(), {
+      body: method != "GET" ? JSON.stringify(requestBody) : undefined,
       method: method,
       headers: this.headers,
     });
 
-    if (!expectError && (resp.status < 200 || resp.status >= 300)) {
-      throw new Error(`unexpected status code: ${resp.status}`);
+    if (resp.status == 204) {
+      return;
     }
 
     const body = await resp.json();
@@ -114,6 +123,10 @@ export class APITester {
       }
     } else if (body.error) {
       throw new Error(`unexpected server error: ${body.error}`);
+    }
+
+    if (!expectError && (resp.status < 200 || resp.status >= 300)) {
+      throw new Error(`unexpected status code: ${resp.status}`);
     }
 
     if (expect) {
