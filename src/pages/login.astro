@@ -2,6 +2,9 @@
 import Page from "#/layouts/page.astro";
 import * as api from "#/lib/api";
 
+const { register } = Astro.props;
+const page = register ? "Register" : "Login";
+
 function submit(e: SubmitEvent) {
   e.preventDefault();
 }
@@ -9,14 +12,47 @@ function submit(e: SubmitEvent) {
 
 <Page title="Login">
   <main>
+    <h2>
+      {page} to
+      <span class="brand">chatter</span>
+    </h2>
     <form onSubmit={submit}>
-      <input type="text" name="username" />
-      <input type="password" name="password" />
-      <button type="submit">Login</button>
+      <input type="text" name="username" placeholder="Username" />
+      <input type="password" name="password" placeholder="Password" />
+      <button type="submit">{page}</button>
     </form>
   </main>
 </Page>
 
 <style>
+  span.brand {
+    font-family: Nunito, sans-serif;
+  }
 
+  body {
+    /* Center the whole form vertically. */
+    display: flex;
+    justify-content: center;
+  }
+
+  main {
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+    padding: 1em;
+    font-size: 1.1em;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+  }
+
+  form > *,
+  form > [type="submit"] {
+    margin: 0;
+    padding: 0.5em;
+    height: auto;
+  }
 </style>

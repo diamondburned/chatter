@@ -5,6 +5,24 @@ anyone using any free serverless hosting service (e.g., Vercel and Netlify).
 
 ## Developing
 
+Before any development, you must have a `.env` or `.envrc` file in the root
+directory of the project. This file must contain these environment variables:
+
+```sh
+DATABASE_URL="postgres://..."
+```
+
+If you're not in my group (you probably aren't), then you will also need
+to migrate your database prior to running it:
+
+```sh
+npm run prisma-reset-prod
+```
+
+**BEWARE** that this will wipe your database and replace it with the
+production database. If you're not in my group, you probably don't want to
+do this.
+
 ### Running
 
 Do
