@@ -2,6 +2,12 @@
   "compilerOptions": {
     "moduleResolution": "nodenext",
     "module": "nodenext",
-    "target": "es2020"
+    "target": "es2020",
+    "extends": "astro/tsconfigs/base",
+    "plugins": [
+      {
+        "name": "@astrojs/ts-plugin"
+      }
+    ]
   }
 }

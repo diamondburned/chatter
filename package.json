@@ -10,19 +10,27 @@
     "test": "vitest --run"
   },
   "dependencies": {
+    "@astrojs/ts-plugin": "^0.4.4",
     "@prisma/client": "^4.2.1",
     "bcryptjs": "^2.4.3",
+    "picnic": "^7.1.0",
+    "sass": "^1.60.0",
     "ulid": "^2.3.0"
   },
   "devDependencies": {
+    "@picocss/pico": "^1.5.7",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@types/node": "^18.14.0",
     "astro": "^2.0.14",
+    "normalize.css": "^8.0.1",
+    "prettier": "^2.8.4",
+    "prettier-plugin-astro": "^0.8.0",
     "prisma": "^4.2.1",
-    "vitest": "^0.28.5",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "vitest": "^0.28.5"
   },
   "imports": {
+    "#/*": "./src/*",
     "#lib/*/": "./src/lib/*/index.js",
     "#lib/*.ts": "./src/lib/*.js",
     "#lib/*.js": "./src/lib/*.js",
