@@ -5,9 +5,7 @@ import path from "path";
 export const config = {
   resolve: {
     alias: {
-      "#lib": path.resolve("./src/lib/"),
-      "#pages": path.resolve("./src/pages/"),
-      "#components": path.resolve("./src/components/"),
+      "#": path.resolve("./src"),
     },
   },
 };

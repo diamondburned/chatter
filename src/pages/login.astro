@@ -1,0 +1,22 @@
+---
+import Page from "#/layouts/page.astro";
+import * as api from "#/lib/api";
+
+function submit(e: SubmitEvent) {
+  e.preventDefault();
+}
+---
+
+<Page title="Login">
+  <main>
+    <form onSubmit={submit}>
+      <input type="text" name="username" />
+      <input type="password" name="password" />
+      <button type="submit">Login</button>
+    </form>
+  </main>
+</Page>
+
+<style>
+
+</style>
