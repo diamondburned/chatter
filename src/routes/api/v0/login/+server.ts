@@ -1,10 +1,10 @@
-import * as astro from "astro";
-import * as api from "#lib/api/index.js";
-import * as db from "#lib/db/index.js";
+import * as api from "#/lib/api/index.js";
+import * as db from "#/lib/db/index.js";
+import type * as sveltekit from "@sveltejs/kit";
 
-export async function post(ctx: astro.APIContext): Promise<Response> {
+export async function POST(ev: sveltekit.ServerLoadEvent): Promise<Response> {
   try {
-    const body: api.LoginRequest = await ctx.request.json();
+    const body: api.LoginRequest = await ev.request.json();
 
     const user = await db.client.user.findUniqueOrThrow({
       where: { username: body.username },

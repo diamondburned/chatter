@@ -1,5 +1,5 @@
-import * as api from "#lib/api/";
-import { APITester, assert, assertEq } from "#lib/testing/";
+import type * as api from "#/lib/api/index.js";
+import { APITester, assert, assertEq } from "#/lib/testing/index.js";
 import { describe, it } from "vitest";
 
 const addr = process.env["TESTING_API"];

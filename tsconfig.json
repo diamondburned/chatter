@@ -1,13 +1,13 @@
 {
+  "extends": "./.svelte-kit/tsconfig.json",
   "compilerOptions": {
     "moduleResolution": "nodenext",
     "module": "nodenext",
     "target": "es2020",
-    "extends": "astro/tsconfigs/base",
-    "plugins": [
-      {
-        "name": "@astrojs/ts-plugin"
-      }
-    ]
+    "paths": {
+      "#/*": [
+        "./src/*"
+      ]
+    }
   }
 }

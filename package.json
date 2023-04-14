@@ -3,39 +3,38 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "astro dev --experimental-static-build",
-    "build": "astro build --experimental-static-build",
+    "dev": "vite --clearScreen=false",
+    "build": "vite build",
     "prisma": "prisma format --schema ./src/lib/db/schema.prisma && prisma generate --schema ./src/lib/db/schema.prisma",
     "prisma-reset-prod": "prisma db push --schema ./src/lib/db/schema.prisma",
     "test": "vitest --run"
   },
   "dependencies": {
-    "@astrojs/ts-plugin": "^0.4.4",
     "@prisma/client": "^4.2.1",
+    "@sveltejs/adapter-auto": "^2.0.0",
+    "@sveltejs/adapter-netlify": "^2.0.6",
+    "@sveltejs/kit": "^1.15.5",
     "bcryptjs": "^2.4.3",
-    "mvp.css": "^1.12.0",
+    "normalize.css": "^8.0.1",
     "picnic": "^7.1.0",
     "sass": "^1.60.0",
+    "simpleflakes": "^2.2.2",
+    "svelte": "^3.58.0",
+    "svelte-preprocess": "^5.0.3",
+    "typescript": "^5.0.4",
     "ulid": "^2.3.0"
   },
   "devDependencies": {
-    "@picocss/pico": "^1.5.7",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@types/node": "^18.14.0",
-    "astro": "^2.0.14",
-    "normalize.css": "^8.0.1",
     "prettier": "^2.8.4",
-    "prettier-plugin-astro": "^0.8.0",
+    "prettier-plugin-svelte": "^2.10.0",
     "prisma": "^4.2.1",
+    "svelte-language-server": "^0.15.9",
     "ts-node": "^10.9.1",
     "vitest": "^0.28.5"
   },
   "imports": {
-    "#/*": "./src/*",
-    "#lib/*/": "./src/lib/*/index.js",
-    "#lib/*.ts": "./src/lib/*.js",
-    "#lib/*.js": "./src/lib/*.js",
-    "#pages/*.astro": "./src/pages/*.astro",
-    "#components/*.astro": "./src/components/*.astro"
+    "#/*": "./src/*"
   }
 }

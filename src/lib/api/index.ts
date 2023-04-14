@@ -1,2 +1,2 @@
-export * from "#lib/api/chatter.ts";
-export * from "#lib/api/rest.ts";
+export * from "#/lib/api/chatter.js";
+export * from "#/lib/api/rest.js";

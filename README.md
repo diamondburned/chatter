@@ -28,6 +28,7 @@ do this.
 Do
 
 ```sh
+npm run prisma # only need to run this the first time
 npm run dev
 ```
 

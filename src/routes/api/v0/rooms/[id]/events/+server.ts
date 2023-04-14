@@ -1,19 +1,19 @@
-import * as astro from "astro";
-import * as api from "#lib/api/index.js";
-import * as db from "#lib/db/index.js";
+import * as api from "#/lib/api/index.js";
+import * as db from "#/lib/db/index.js";
+import type * as sveltekit from "@sveltejs/kit";
 
-export async function get(ctx: astro.APIContext): Promise<Response> {
-  const url = new URL(ctx.request.url);
+export async function GET(ev: sveltekit.ServerLoadEvent): Promise<Response> {
+  const url = new URL(ev.request.url);
 
   let session: db.prisma.Session;
   try {
-    session = await db.authorize(ctx.request);
+    session = await db.authorize(ev.request);
   } catch (err) {
     return api.respondError(401, err);
   }
 
   try {
-    const roomID = ctx.params.id;
+    const roomID = ev.params.id;
     const body: api.RoomEventsRequest = {
       limit: api.scanURLParam(url, "limit"),
       before: api.scanURLParam(url, "before"),
@@ -46,17 +46,17 @@ const allowedEvents = new Set([
   "message_delete",
 ]);
 
-export async function post(ctx: astro.APIContext): Promise<Response> {
+export async function POST(ev: sveltekit.ServerLoadEvent): Promise<Response> {
   let session: db.prisma.Session;
   try {
-    session = await db.authorize(ctx.request);
+    session = await db.authorize(ev.request);
   } catch (err) {
     return api.respondError(401, err);
   }
 
   try {
-    const roomID = ctx.params.id;
-    const body: api.SendEventRequest = await ctx.request.json();
+    const roomID = ev.params.id;
+    const body: api.SendEventRequest = await ev.request.json();
 
     if (!allowedEvents.has(body.type)) {
       throw new Error("invalid event type");

@@ -1,2 +1,9 @@
 $mobile-width: 400px;
 $picnic-radius: 0.4em;
+$brand-gradient: linear-gradient(60deg, #e21143, #ffb03a);
+$error-color: #e21143;
+
+:root {
+  --brand-gradient: #{$brand-gradient};
+  --error-color: #{$error-color};
+}

@@ -26,7 +26,7 @@ export class APITester {
     path: string,
     params: Record<string, string>,
     expect?: Exclude<T, typeof ExpectError>
-  ): Promise<Exclude<T, api.ErrorResponse>>;
+  ): Promise<Extract<T, { error: never }>>;
 
   get<T extends api.ErrorResponse>(
     path: string,
@@ -42,11 +42,11 @@ export class APITester {
     return this.do("GET", path, params, {}, expect, expect === ExpectError);
   }
 
-  post<ReqT, RespT extends api.ErrorResponse | any>(
+  post<ReqT, RespT extends api.FailableResponse<any>>(
     path: string,
     body: ReqT,
     expect?: Exclude<RespT, typeof ExpectError>
-  ): Promise<Exclude<RespT, api.ErrorResponse>>;
+  ): Promise<Extract<RespT, { error: never }>>;
 
   post<ReqT, RespT extends api.ErrorResponse>(
     path: string,
@@ -173,9 +173,11 @@ export function assertEq<T1, T2 extends T1>(a: T1, b: T2, message = "$") {
         assertEq(a[i], b[i], message + "[]");
       }
     } else {
-      const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+      const oa = a as Record<string, any>;
+      const ob = b as Record<string, any>;
+      const keys = new Set([...Object.keys(oa), ...Object.keys(ob)]);
       for (const key of keys) {
-        assertEq(a[key], b[key], message + "." + key);
+        assertEq(oa[key], ob[key], message + "." + key);
       }
     }
   } else {

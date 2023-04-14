@@ -1,13 +1,13 @@
-import * as astro from "astro";
-import * as api from "#lib/api/";
-import * as db from "#lib/db/";
+import * as api from "#/lib/api/index.js";
+import * as db from "#/lib/db/index.js";
+import type * as sveltekit from "@sveltejs/kit";
 
-export async function get(ctx: astro.APIContext): Promise<Response> {
-  const url = new URL(ctx.request.url);
+export async function GET(ev: sveltekit.ServerLoadEvent): Promise<Response> {
+  const url = new URL(ev.request.url);
 
   let session: db.prisma.Session;
   try {
-    session = await db.authorize(ctx.request);
+    session = await db.authorize(ev.request);
   } catch (err) {
     return api.respondError(401, err);
   }

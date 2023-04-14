@@ -1,31 +1,32 @@
-import * as astro from "astro";
-import * as api from "#lib/api/index.js";
-import * as db from "#lib/db/index.js";
+import * as api from "#/lib/api/index.js";
+import * as db from "#/lib/db/index.js";
+import { env } from "$env/dynamic/private";
+import type * as sveltekit from "@sveltejs/kit";
 
 const allowRegistration = true;
 let registrationSecret: Promise<Buffer> | undefined;
 
-if (process.env["REGISTRATION_SECRET"]) {
+if (env["REGISTRATION_SECRET"]) {
   registrationSecret = db
-    .hashPassword(process.env["REGISTRATION_SECRET"])
+    .hashPassword(env["REGISTRATION_SECRET"])
     .then((hash) => Buffer.from(hash));
 }
 
-export async function post(ctx: astro.APIContext): Promise<Response> {
+export async function POST(ev: sveltekit.ServerLoadEvent): Promise<Response> {
   if (!allowRegistration) {
     return api.respondError(403, "Registration is disabled");
   }
 
   let body: api.RegisterRequest;
   try {
-    body = await ctx.request.json();
+    body = await ev.request.json();
     api.AssertStrongPassword(body.password);
   } catch (err) {
     return api.respondError(400, err);
   }
 
   if (registrationSecret) {
-    const secret = ctx.request.headers.get("X-Registration-Secret");
+    const secret = ev.request.headers.get("X-Registration-Secret");
     if (
       !secret ||
       !(await db.comparePassword(await registrationSecret, secret))

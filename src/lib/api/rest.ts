@@ -1,5 +1,4 @@
-import * as api from "#lib/api/index.js";
-import * as astro from "astro";
+import type * as api from "#/lib/api/index.js";
 
 // respondError is a helper function to respond with an error.
 export function respondError(code: number, why: any, message = ""): Response {
@@ -10,6 +9,31 @@ export function respondError(code: number, why: any, message = ""): Response {
     error: message ? `${message}: ${errstr}` : errstr,
   };
   return new Response(JSON.stringify(body), { status: code });
+}
+
+// request is a helper function to invoke a fetch() request.
+export async function request<T extends FailableResponse<any>>(
+  path: string,
+  init?: RequestInit
+): Promise<Extract<T, { error: never }>> {
+  const resp = await fetch(path, init);
+  const die = (err?) => {
+    if (!resp.ok) {
+      throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+    }
+    throw err;
+  };
+
+  const body = await resp.json().catch(die);
+  if (!resp.ok) {
+    const err = body as api.ErrorResponse;
+    if (err.error) {
+      throw err.error;
+    }
+    die();
+  }
+
+  return body as Extract<T, { error: never }>;
 }
 
 function fmterr(err: any): string {
@@ -62,7 +86,14 @@ export type ErrorResponse = {
 };
 
 // Response wraps a response type with an ErrorResponse.
-export type FailableResponse<T> = ErrorResponse | T;
+export type FailableResponse<T extends Object> =
+  | ErrorResponse
+  | ({ error: never } & T);
+
+// SuccessfulResponse wraps a FailableResponse and returns the successful
+// response type.
+export type SuccessfulResponse<Failable extends FailableResponse<any>> =
+  Extract<Failable, { error: never }>;
 
 // LoginRequest is a login request.
 export type LoginRequest = {
