@@ -1,4 +1,4 @@
-import * as api from "#lib/api/";
+import type * as api from "#/lib/api/index.js";
 
 // ExpectError is passed into the expect field to indicate that any error should
 // be expected.
@@ -15,6 +15,7 @@ export class APITester {
     }
 
     this.url = new URL(urlstr);
+    this.headers.set("Origin", this.url.origin);
 
     // This doesn't work for some reason. What the heck, JavaScript?
     // if (this.url.protocol == "") {
@@ -116,7 +117,15 @@ export class APITester {
       return;
     }
 
-    const body = await resp.json();
+    const text = await resp.text();
+
+    let body;
+    try {
+      body = JSON.parse(text);
+    } catch (err) {
+      throw new Error(`Failed to parse response body (${text}): ${err}`);
+    }
+
     if (expectError) {
       if (!body.error) {
         throw new Error(`expected server error, got: ${body}`);
