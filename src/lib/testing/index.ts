@@ -27,7 +27,7 @@ export class APITester {
     path: string,
     params: Record<string, string>,
     expect?: Exclude<T, typeof ExpectError>
-  ): Promise<Extract<T, { error: never }>>;
+  ): Promise<Extract<T, { error?: undefined }>>;
 
   get<T extends api.ErrorResponse>(
     path: string,
@@ -47,7 +47,7 @@ export class APITester {
     path: string,
     body: ReqT,
     expect?: Exclude<RespT, typeof ExpectError>
-  ): Promise<Extract<RespT, { error: never }>>;
+  ): Promise<Extract<RespT, { error?: undefined }>>;
 
   post<ReqT, RespT extends api.ErrorResponse>(
     path: string,

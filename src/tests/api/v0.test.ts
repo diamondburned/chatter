@@ -93,7 +93,8 @@ describe("api/v0", () => {
     lastAck = sync.ack;
     // console.debug(`synced to ${sync.ack}:`, sync);
 
-    assertEq(sync.events.length, 1);
+    assert(sync.events[ourRoomID]);
+    assertEq(sync.events[ourRoomID].length, 1);
 
     assert(sync.me.ownsRooms.length > 0);
     assert(sync.me.ownsRooms.find((r) => r.id == ourRoomID));
@@ -124,9 +125,10 @@ describe("api/v0", () => {
     lastAck = sync.ack;
     // console.debug(`synced to ${sync.ack}:`, sync);
 
-    assertEq(sync.events.length, 1);
-    assertEq(sync.events[0].id, ourMessageID);
-    assertEq(sync.events[0].type, "message_create");
+    assert(sync.events[ourRoomID]);
+    assertEq(sync.events[ourRoomID].length, 1);
+    assertEq(sync.events[ourRoomID][0].id, ourMessageID);
+    assertEq(sync.events[ourRoomID][0].type, "message_create");
   });
 
   it("list events", async () => {
@@ -157,7 +159,7 @@ describe("api/v0", () => {
     lastAck = sync.ack;
     // console.debug(`synced to ${sync.ack}:`, sync);
 
-    assert(!sync.events.length);
+    assert(!Object.entries(sync.events).length);
     assert(!sync.me.ownsRooms.find((r) => r.id == ourRoomID));
     assert(!sync.me.joinedRooms.find((r) => r.id == ourRoomID));
   });

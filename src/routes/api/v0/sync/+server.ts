@@ -58,11 +58,9 @@ export async function GET(ev: sveltekit.ServerLoadEvent): Promise<Response> {
       .map((r) => db.convertRoom(r, r.owner));
     const ownsRooms = user.ownsRooms.map((r) => db.convertRoom(r, r.owner));
 
-    const events: api.RoomEvent[] = [];
-    for (const roomMember of user.joinedRooms) {
-      events.push(
-        ...roomMember.room.events.map((ev) => db.convertEvent(ev, ev.author))
-      );
+    const events: Record<string, api.RoomEvent[]> = {};
+    for (const { room } of user.joinedRooms) {
+      events[room.id] = room.events.map((ev) => db.convertEvent(ev, ev.author));
     }
 
     const sync: api.SyncResponse = {

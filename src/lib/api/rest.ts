@@ -15,7 +15,7 @@ export function respondError(code: number, why: any, message = ""): Response {
 export async function request<T extends FailableResponse<any>>(
   path: string,
   init?: RequestInit
-): Promise<Extract<T, { error: never }>> {
+): Promise<OKResponse<T>> {
   const resp = await fetch(path, init);
   const die = (err?) => {
     if (!resp.ok) {
@@ -33,7 +33,7 @@ export async function request<T extends FailableResponse<any>>(
     die();
   }
 
-  return body as Extract<T, { error: never }>;
+  return body as OKResponse<T>;
 }
 
 function fmterr(err: any): string {
@@ -88,12 +88,13 @@ export type ErrorResponse = {
 // Response wraps a response type with an ErrorResponse.
 export type FailableResponse<T extends Object> =
   | ErrorResponse
-  | ({ error: never } & T);
+  | ({ error?: undefined } & T);
 
-// SuccessfulResponse wraps a FailableResponse and returns the successful
-// response type.
-export type SuccessfulResponse<Failable extends FailableResponse<any>> =
-  Extract<Failable, { error: never }>;
+// OKResponse wraps a FailableResponse and returns the successful response type.
+export type OKResponse<Failable extends FailableResponse<any>> = Extract<
+  Failable,
+  { error?: undefined }
+>;
 
 // LoginRequest is a login request.
 export type LoginRequest = {
@@ -197,5 +198,5 @@ export type SyncResponse = FailableResponse<{
   // list of messages. Only messages that are newer than the last sync timestamp
   // are returned. There will be a limit of 100 messages per room. To get more
   // messages, the client should send a RoomEventsRequest.
-  events: api.RoomEvent[];
+  events: Record<string, api.RoomEvent[]>;
 }>;
