@@ -44,11 +44,13 @@ npm run test
 
 ```
 - src
-  - components/      -- frontend components
-  - layouts/	     -- frontend page layouts
+  - components/       -- frontend components
   - pages/
-    - api/           -- backend api implementation
-	- index.astro    -- app page for chats
-	- login.astro    -- login page
-	- register.astro -- registration page
+    - api/            -- backend api implementation
+    - login/
+      - +page.svelte  -- login page
+    - register/
+      - +page.svelte  -- registration page
+    - +layout.svelte  -- layout for all pages
+    - +page.svelte    -- main app page for chats
 ```
