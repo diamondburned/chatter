@@ -1,15 +1,25 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import { token, sync } from "#/lib/frontend/state.js";
   import * as svelte from "svelte";
 
-  let token: string;
+  import Room from "#/routes/room/[id]/+page.svelte";
 
   svelte.onMount(() => {
-    token = localStorage.getItem("chatter_token");
-    if (!token) {
+    if (!$token) {
       goto("/login");
     }
+
+    let stop = false;
+    async function start() {
+      if (!stop) {
+        await sync();
+        window.setTimeout(start, 2500);
+      }
+    }
+    start();
+    return () => (stop = true);
   });
 </script>
 
-<p>Hello!</p>
+<Room data={{}} />

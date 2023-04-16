@@ -3,6 +3,7 @@
 @import "picnic/src/picnic.scss";
 @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Inconsolata:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0");
 
 // picnic.css is terrible.
 
@@ -20,6 +21,19 @@ span.brand {
 
 a[role="button"] {
   @extend button;
+}
+
+input {
+  border: 1px solid #{lighten($picnic-dull, 25%)};
+  background-color: #{lighten($picnic-dull, 25%)};
+}
+
+p.error:empty {
+  display: none;
+}
+
+input[type="file"] {
+  border: none;
 }
 
 .error {

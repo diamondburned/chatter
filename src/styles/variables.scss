@@ -1,7 +1,28 @@
+@import "picnic/src/themes/default/_colors.scss";
+
 $mobile-width: 400px;
-$picnic-radius: 0.4em;
 $brand-gradient: linear-gradient(60deg, #e21143, #ffb03a);
 $error-color: #e21143;
+
+$picnic-white: $white;
+$picnic-black: $black;
+$picnic-primary: $blue;
+$picnic-success: $green;
+$picnic-warning: $orange;
+$picnic-error: $red;
+$picnic-dull: $gray;
+$picnic-color-variation: 10%;
+$picnic-transparency: 0.2;
+
+$picnic-separation: 0.6em;
+$picnic-breakpoint: 60em;
+
+$picnic-radius: 0.4em;
+$picnic-border: 1px solid $picnic-dull;
+$picnic-shadow: 0 0 0.2em rgba($picnic-dull, $picnic-transparency);
+$picnic-overlay: rgba($picnic-black, $picnic-transparency);
+
+$picnic-transition: all 0.3s;
 
 :root {
   --brand-gradient: #{$brand-gradient};

@@ -2,7 +2,7 @@ import * as prisma from "@prisma/client";
 import * as bcrypt from "bcryptjs";
 import * as crypto from "crypto";
 import * as ulid from "ulid";
-import * as api from "#/lib/api/index.js";
+import type * as api from "#/lib/api/index.js";
 import assert from "assert";
 import { simpleflake, parseSimpleflake } from "simpleflakes";
 

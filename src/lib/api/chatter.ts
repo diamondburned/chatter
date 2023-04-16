@@ -28,6 +28,23 @@ export type User = {
   }>;
 };
 
+// shortenID shortens a long user ID to a short ID.
+export function shortenID(id: string): string {
+  // Adler32 implementation taken from
+  // https://en.wikipedia.org/wiki/Adler-32#Example_implementation
+  function hasher(s: string) {
+    const adlerMod = 65521;
+    let a = 1;
+    let b = 0;
+    for (let i = 0; i < s.length; i++) {
+      a = (a + s.charCodeAt(i)) % adlerMod;
+      b = (b + a) % adlerMod;
+    }
+    return (b << 16) | a;
+  }
+  return (hasher(id) % 0xffff).toString(16).toUpperCase();
+}
+
 // Me is the current user.
 export type Me = User & {
   ownsRooms: Room[];

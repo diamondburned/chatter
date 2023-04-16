@@ -1,5 +1,6 @@
 <script lang="ts">
   import * as api from "#/lib/api/index.js";
+  import { token } from "#/lib/frontend/state.js";
   import { goto } from "$app/navigation";
 
   export let register = false;
@@ -31,7 +32,7 @@
           method: "POST",
           headers,
         });
-        localStorage.setItem("chatter_token", res.token);
+        $token = res.token;
         goto("/");
       } catch (err) {
         error = `${err}`;
@@ -69,7 +70,7 @@
   </form>
 </main>
 
-<style lang="scss">
+<style>
   span.brand {
     font-family: Nunito, sans-serif;
   }
