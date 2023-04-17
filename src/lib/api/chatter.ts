@@ -1,9 +1,17 @@
+import * as ulid from "ulid";
+
 // Timestamp is an RFC3339 timestamp string.
 export type Timestamp = `${string}T${string}`;
 
 // DateToTimestamp converts a Date to a Timestamp.
 export function DateToTimestamp(d: Date): Timestamp {
   return d.toISOString() as Timestamp;
+}
+
+// DateFromID returns the date from a ULID.
+export function DateFromID(id: string): Date {
+  const t = ulid.decodeTime(id);
+  return new Date(t);
 }
 
 // Resource describes a resource that can either be a remote file or a data

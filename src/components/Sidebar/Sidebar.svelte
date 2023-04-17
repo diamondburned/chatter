@@ -6,6 +6,7 @@
   import Icon from "#/components/Icon.svelte";
   import Modal from "#/components/Modal.svelte";
   import Symbol from "#/components/Symbol.svelte";
+  import RoomItem from "#/components/Sidebar/RoomItem.svelte";
   import RoomSearchDialog from "#/components/Sidebar/RoomSearchDialog.svelte";
   import RoomCreateDialog from "#/components/Sidebar/RoomCreateDialog.svelte";
 
@@ -72,23 +73,15 @@
     </div>
     <div class="room-list">
       {#if rooms}
+        <h4>Rooms</h4>
         <ul>
           {#each rooms as room}
             <li>
-              <a
-                role="button"
+              <RoomItem
+                {room}
                 href="/room/{room.id}"
-                class:selected={selectedRoomID == room.id}
-              >
-                <Icon
-                  url={room.attributes.avatar}
-                  name={room.name}
-                  symbol="chat_bubble"
-                />
-                <p>
-                  <span class="room-name">{room.name}</span>
-                </p>
-              </a>
+                selected={selectedRoomID == room.id}
+              />
             </li>
           {/each}
         </ul>
@@ -136,6 +129,11 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+  }
+
+  h4 {
+    padding-bottom: 0;
+    text-align: center;
   }
 
   .rooms {
@@ -189,10 +187,6 @@
       box-shadow: 0 0 0.5em #0003;
       border-radius: $picnic-radius;
 
-      :global(h4) {
-        padding-bottom: 0;
-      }
-
       :global(ul) {
         list-style: none;
         padding: 0.25em;
@@ -228,6 +222,7 @@
   }
 
   .room-list {
+    margin: 0.25em;
     height: 100%;
     overflow-y: auto;
 
@@ -239,6 +234,16 @@
       text-align: center;
 
       margin: 1.5em;
+    }
+
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+
+      li {
+        margin: 0;
+      }
     }
   }
 

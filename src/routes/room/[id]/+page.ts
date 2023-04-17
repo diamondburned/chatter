@@ -1,6 +1,6 @@
 import type { PageLoad } from "./$types.js";
 
-const load: PageLoad = ({ params }) => {
+export const load: PageLoad = ({ params }) => {
   return {
     roomID: params.id,
   };

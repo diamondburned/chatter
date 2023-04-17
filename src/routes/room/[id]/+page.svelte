@@ -1,20 +1,24 @@
 <script lang="ts">
-  import type { PageData } from "./$types";
+  import { state } from "#/lib/frontend/state.js";
 
   import Sidebar from "#/components/Sidebar/Sidebar.svelte";
-  import MessageView from "#/components/MessageView.svelte";
+  import MessageView from "#/components/MessageView/MessageView.svelte";
 
   // this is weird, why can I not just do like $page.params.id lol
-  export let data: PageData;
+  export let data: { roomID: string };
+
+  $: room = $state.me
+    ? $state.me.joinedRooms.find((room) => room.id == data.roomID)
+    : null;
 </script>
 
 <div class="room-page">
   <div class="sidebar">
-    <Sidebar selectedRoomID={data.roomID} />
+    <Sidebar selectedRoomID={room?.id} />
   </div>
   <div class="message-view">
-    {#if data.roomID}
-      <MessageView roomID={data.roomID} />
+    {#if room}
+      <MessageView {room} />
     {:else}
       <div class="placeholder">
         <span class="brand">chatter</span>

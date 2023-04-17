@@ -4,7 +4,6 @@ import * as crypto from "crypto";
 import * as ulid from "ulid";
 import type * as api from "#/lib/api/index.js";
 import assert from "assert";
-import { simpleflake, parseSimpleflake } from "simpleflakes";
 
 export { Prisma } from "@prisma/client";
 export { prisma };

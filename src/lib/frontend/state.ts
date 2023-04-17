@@ -3,11 +3,29 @@ import * as api from "#/lib/api/index.js";
 import * as persistent from "#/lib/frontend/persistent.js";
 
 interface Toast {
-  message: string;
   type: "error" | "success";
+  message: string;
+  expires: number;
 }
 
-export const toasts = store.writable<Toast | null>(null);
+export const toasts = store.writable<Toast[]>([]);
+
+export function addToast(
+  type: "error" | "success",
+  message: string,
+  duration = 10000
+) {
+  const expires = Date.now() + duration;
+  toasts.update((toasts) => {
+    return [...toasts, { message, type, expires }];
+  });
+
+  setTimeout(() => {
+    toasts.update((toasts) => {
+      return toasts.filter((toast) => toast.expires > expires);
+    });
+  }, duration);
+}
 
 export const showSettings = store.writable(false);
 
@@ -26,7 +44,7 @@ export type State = {
 export const token = persistent.writable<string | null>("chatter_token", null);
 
 // state contains the current state of the user.
-export const state = store.writable<State>({
+export const state = persistent.writable<State>("chatter_state", {
   events: {},
 });
 
