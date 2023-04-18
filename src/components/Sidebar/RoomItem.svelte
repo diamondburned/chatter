@@ -22,11 +22,11 @@
   class:disabled
 >
   <Icon url={room.attributes.avatar} name={room.name} symbol="chat_bubble" />
-  <p>
-    <slot name="name">
+  <slot name="name">
+    <p>
       <span class="room-name">{room.name}</span>
-    </slot>
-  </p>
+    </p>
+  </slot>
   <div class="action">
     <slot name="action" />
   </div>
