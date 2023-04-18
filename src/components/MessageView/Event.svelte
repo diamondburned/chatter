@@ -7,12 +7,6 @@
         return `joined the room.`;
       case "member_leave":
         return `left the room.`;
-      case "message_create":
-        return `sent a message.`;
-      case "message_update":
-        return `updated a message.`;
-      case "message_delete":
-        return `deleted a message.`;
       default:
         return `sent event ${event.type}.`;
     }
@@ -21,7 +15,8 @@
 
 <script lang="ts">
   import * as api from "#/lib/api/index.js";
-  import { shortTime } from "#/lib/frontend/time.js";
+  import * as svelte from "svelte";
+  import { shortTime, onMidnight } from "#/lib/frontend/time.js";
 
   import Icon from "#/components/Icon.svelte";
   import Message from "#/components/MessageView/Message.svelte";
@@ -29,6 +24,13 @@
   export let event: api.RoomEvent;
   export let compact = false;
   $: createdAt = api.DateFromID(event.id);
+  $: createdAtString = shortTime(createdAt);
+
+  svelte.onMount(() => {
+    return onMidnight(() => {
+      createdAtString = shortTime(createdAt);
+    });
+  });
 </script>
 
 <div class="event event-{event.type}" class:compact>
@@ -51,8 +53,11 @@
             <span class="content">{summarize(event)}</span>
           {/if}
         </p>
-        <time datetime={createdAt.toISOString()}>
-          {shortTime(createdAt)}
+        <time
+          datetime={createdAt.toISOString()}
+          title={createdAt.toLocaleString()}
+        >
+          {createdAtString}
         </time>
       </div>
     {/if}
