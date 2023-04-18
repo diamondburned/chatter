@@ -56,6 +56,7 @@
     console.log(events);
   }
 
+  let textarea: HTMLTextAreaElement;
   let sending = false;
   let input = "";
   $: disabled = sending || !input;
@@ -98,9 +99,30 @@
   }
 
   function onInputKeyDown(event: KeyboardEvent) {
-    if (event.key === "Enter" && !event.shiftKey) {
+    if (event.key == "Enter") {
+      // Get the input buffer up to the cursor position.
+      const buffer = input.slice(0, textarea.selectionStart);
+
+      // inCodeBlock is true if the number of triple backticks is odd. It's a
+      // hack, but whatever :)
+      const inBlock = buffer.split("```").length % 2 == 0;
+
+      if (!event.shiftKey && !inBlock) {
+        event.preventDefault();
+        sendMessage();
+        return;
+      }
+    }
+
+    if (event.key == "Tab") {
       event.preventDefault();
-      sendMessage();
+      textarea.setRangeText(
+        "\t",
+        textarea.selectionStart,
+        textarea.selectionEnd,
+        "end"
+      );
+      return;
     }
   }
 </script>
@@ -130,6 +152,7 @@
       class:multiline
       on:keydown={onInputKeyDown}
       bind:value={input}
+      bind:this={textarea}
       disabled={sending}
     />
     <button type="submit" {disabled}>
@@ -180,6 +203,7 @@
 
     textarea.multiline {
       height: 5em;
+      scrollbar-width: thin;
     }
   }
 </style>
