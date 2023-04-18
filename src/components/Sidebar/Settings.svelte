@@ -1,6 +1,7 @@
 <script lang="ts">
   import * as api from "#/lib/api/index.js";
-  import { sync, settings } from "#/lib/frontend/state.js";
+  import { token, sync, settings } from "#/lib/frontend/state.js";
+  import { compressAvatar } from "#/lib/frontend/image.js";
 
   import Dialog from "#/components/Dialog.svelte";
 
@@ -9,7 +10,38 @@
 
   let savingUserSettings = false;
   async function submitUserSettings(ev: SubmitEvent) {
-    const data = new FormData(ev.target as HTMLFormElement);
+    savingUserSettings = true;
+
+    try {
+      const data = new FormData(ev.target as HTMLFormElement);
+      const body: api.UpdateUserRequest = {
+        username: data.has("username")
+          ? (data.get("username") as string)
+          : undefined,
+        attributes: {
+          avatar: await (async () => {
+            const file = data.get("avatar") as File;
+            if (!file || file.size == 0) {
+              return undefined; // no actual file, size=0 is a valid case???
+            }
+            return await compressAvatar(file);
+          })(),
+        },
+      };
+      console.log(body);
+
+      await api.request("/api/v0/users/me", {
+        method: "PATCH",
+        body: JSON.stringify(body),
+        headers: { Authorization: $token },
+      });
+
+      await sync();
+    } catch (err) {
+      error = `${err}`;
+    } finally {
+      savingUserSettings = false;
+    }
   }
 </script>
 
@@ -18,7 +50,7 @@
   <p class="error">{error}</p>
   <section class="general-settings">
     <h3>General Settings <small>(auto-saved)</small></h3>
-    <form class="general-settings" on:submit|preventDefault={() => {}}>
+    <form class="general-settings">
       <formset>
         <label for="sync-duration">Sync Duration (ms)</label>
         <input

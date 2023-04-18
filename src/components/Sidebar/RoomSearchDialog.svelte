@@ -28,7 +28,7 @@
       rooms = resp.rooms;
       hasMore = resp.hasMore;
     } catch (err) {
-      error = err.message;
+      error = `${err}`;
     } finally {
       busy = false;
     }
@@ -48,7 +48,7 @@
 
     try {
     } catch (err) {
-      error = err.message;
+      error = `${err}`;
     }
   }
 </script>

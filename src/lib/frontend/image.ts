@@ -8,6 +8,7 @@ function loadPreview(): HTMLElement {
 
   div = document.createElement("div");
   div.id = elementID;
+  div.style.display = "none";
   document.body.appendChild(div);
 
   return div;
@@ -70,4 +71,15 @@ export async function compressImage(
   preview.removeChild(canvas);
 
   return dataURL as api.Resource | undefined;
+}
+
+export async function compressAvatar(
+  image: File
+): Promise<api.Resource | undefined> {
+  return compressImage(image, {
+    targetMIME: "image/jpeg",
+    quality: 0.7,
+    maxWidth: 128,
+    maxHeight: 128,
+  });
 }

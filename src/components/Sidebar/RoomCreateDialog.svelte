@@ -1,6 +1,6 @@
 <script lang="ts">
   import * as api from "#/lib/api/index.js";
-  import { compressImage } from "#/lib/frontend/image.js";
+  import { compressAvatar } from "#/lib/frontend/image.js";
   import { token, sync } from "#/lib/frontend/state.js";
   import { slide } from "svelte/transition";
 
@@ -29,10 +29,7 @@
       }
 
       if (avatarFiles) {
-        creatingRoom.attributes.avatar = await compressImage(avatarFiles[0], {
-          maxWidth: 128,
-          maxHeight: 128,
-        });
+        creatingRoom.attributes.avatar = await compressAvatar(avatarFiles[0]);
       }
 
       if (creatingRoomExtras) {
@@ -53,7 +50,7 @@
       await sync();
       open = false;
     } catch (err) {
-      error = err.message;
+      error = `${err}`;
     } finally {
       busy = false;
     }
