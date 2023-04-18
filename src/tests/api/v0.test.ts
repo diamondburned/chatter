@@ -47,7 +47,29 @@ describe("api/v0", () => {
   it("sync", async () => {
     const sync = await tester.get<api.SyncResponse>("/api/v0/sync", {});
     lastAck = sync.ack;
-    // console.debug(`synced to ${sync.ack}:`, sync);
+    assertEq(sync.me.id, meID);
+  });
+
+  it("update user", async () => {
+    await tester.patch<api.UpdateUserRequest, api.UserResponse>(
+      `/api/v0/users/${meID}`,
+      {
+        username: "tester bester", // ok copilot
+        attributes: {
+          avatar: "data:x;base64,",
+          mastodon: "@_@botsin.space",
+        },
+      }
+    );
+
+    const user2 = await tester.get<api.UserResponse>(
+      `/api/v0/users/${meID}`,
+      {}
+    );
+
+    assertEq(user2.username, "tester bester");
+    assertEq(user2.attributes.avatar, "data:x;base64,");
+    assertEq(user2.attributes.mastodon, "@_@botsin.space");
   });
 
   it("delete existing room", async () => {

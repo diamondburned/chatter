@@ -119,6 +119,15 @@ export type RegisterRequest = {
 // RegisterResponse is the same as LoginResponse.
 export type RegisterResponse = FailableResponse<LoginResponse>;
 
+// UserResponse is the response to a user request.
+export type UserResponse = FailableResponse<api.User>;
+
+// UserUpdateRequest is a request to update a user.
+export type UpdateUserRequest = Partial<Omit<api.User, "id">>;
+
+// UserUpdateResponse is the response to a user update request.
+export type UpdateUserResponse = FailableResponse<api.User>;
+
 // SendEventRequest is a request to send a message.
 export type SendEventRequest = Pick<api.RoomEvent, "type" | "content">;
 
