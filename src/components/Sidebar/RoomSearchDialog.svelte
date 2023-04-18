@@ -157,6 +157,7 @@
 
     p {
       margin: 0;
+      text-align: left;
       line-height: 1.25;
     }
 
