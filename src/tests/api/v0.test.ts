@@ -51,8 +51,8 @@ describe("api/v0", () => {
   });
 
   it("update user", async () => {
-    await tester.patch<api.UpdateUserRequest, api.UserResponse>(
-      `/api/v0/users/${meID}`,
+    await tester.patch<api.UpdateUserRequest, api.UpdateUserResponse>(
+      `/api/v0/users/me`,
       {
         username: "tester bester", // ok copilot
         attributes: {
@@ -62,11 +62,8 @@ describe("api/v0", () => {
       }
     );
 
-    const user2 = await tester.get<api.UserResponse>(
-      `/api/v0/users/${meID}`,
-      {}
-    );
-
+    const user2 = await tester.get<api.UserResponse>(`/api/v0/users/me`, {});
+    assertEq(user2.id, meID);
     assertEq(user2.username, "tester bester");
     assertEq(user2.attributes.avatar, "data:x;base64,");
     assertEq(user2.attributes.mastodon, "@_@botsin.space");

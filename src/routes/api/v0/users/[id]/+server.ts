@@ -13,7 +13,10 @@ export async function GET(ev: sveltekit.ServerLoadEvent): Promise<Response> {
   }
 
   try {
-    const userID = ev.params.id;
+    let userID = ev.params.id;
+    if (userID == "me") {
+      userID = session.userID;
+    }
 
     const user = await db.client.user.findUniqueOrThrow({
       where: {
@@ -39,7 +42,11 @@ export async function PATCH(ev: sveltekit.ServerLoadEvent): Promise<Response> {
   }
 
   try {
-    const userID = ev.params.id;
+    let userID = ev.params.id;
+    if (userID == "me") {
+      userID = session.userID;
+    }
+
     const body: api.UpdateUserRequest = await ev.request.json();
 
     // https://github.com/prisma/prisma/discussions/3070
