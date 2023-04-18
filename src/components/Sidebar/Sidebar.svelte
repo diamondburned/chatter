@@ -264,7 +264,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.5em;
-    padding: 0.45em;
+    padding: 0.25em 0.45em;
 
     button {
       padding: 0.25em;
