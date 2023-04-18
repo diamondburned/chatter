@@ -59,6 +59,7 @@
   let sending = false;
   let input = "";
   $: disabled = sending || !input;
+  $: multiline = input.includes("\n");
 
   async function sendMessage() {
     if (disabled) {
@@ -95,6 +96,13 @@
       sending = false;
     }
   }
+
+  function onInputKeyDown(event: KeyboardEvent) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      sendMessage();
+    }
+  }
 </script>
 
 <header>
@@ -119,6 +127,8 @@
       name="message"
       rows={1}
       placeholder="Send a message"
+      class:multiline
+      on:keydown={onInputKeyDown}
       bind:value={input}
       disabled={sending}
     />
@@ -166,6 +176,10 @@
     button {
       padding: 0.35em 0.5em;
       margin: 0;
+    }
+
+    textarea.multiline {
+      height: 5em;
     }
   }
 </style>
