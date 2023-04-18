@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as api from "#/lib/api/index.js";
   import * as svelte from "svelte";
-  import { state, token } from "#/lib/frontend/state.js";
+  import { state, token, sync } from "#/lib/frontend/state.js";
 
   import Icon from "#/components/Icon.svelte";
   import Dialog from "#/components/Dialog.svelte";
@@ -50,10 +50,15 @@
       : null;
   }
 
-  function joinRoom(room: api.Room) {
+  async function joinRoom(room: api.Room) {
     joining[room.id] = true;
 
     try {
+      await api.request(`/api/v0/rooms/${room.id}/join`, {
+        method: "POST",
+        headers: { Authorization: $token },
+      });
+      await sync();
     } catch (err) {
       error = `${err}`;
     }
