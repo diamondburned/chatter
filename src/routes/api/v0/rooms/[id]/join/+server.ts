@@ -12,13 +12,7 @@ export async function POST(ev: sveltekit.ServerLoadEvent): Promise<Response> {
 
   try {
     const roomID = ev.params.id;
-
-    await db.client.roomMember.create({
-      data: {
-        roomID,
-        userID: session.userID,
-      },
-    });
+    await db.joinRoom(session, roomID);
 
     return api.respond();
   } catch (err) {
