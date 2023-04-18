@@ -31,7 +31,7 @@
 <aside>
   <section class="rooms">
     <div class="search">
-      <input type="text" placeholder="Search" />
+      <input type="text" placeholder="Search" bind:value={searchRoom} />
       <button
         class="menu"
         title="Menu"
