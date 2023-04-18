@@ -91,11 +91,6 @@
 </Dialog>
 
 <style lang="scss">
-  :global(#join-room .contents > *) {
-    margin: 0.35rem 1rem;
-    padding: 0;
-  }
-
   .search {
     display: flex;
     flex-direction: row;

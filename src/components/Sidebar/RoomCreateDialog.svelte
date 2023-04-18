@@ -138,8 +138,8 @@
       flex-direction: column;
 
       & > * {
-        margin: 0.35rem 1rem;
         padding: 0;
+        margin-top: 0.35rem;
       }
     }
 

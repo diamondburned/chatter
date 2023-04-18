@@ -32,6 +32,15 @@ export const showSettings = store.writable(false);
 export const SyncEndpoint = "/api/v0/sync";
 export const EventsLimit = 250;
 
+// Settings describes the general settings.
+export type Settings = {
+  syncDuration: number;
+};
+
+export const settings = persistent.writable<Settings>("chatter_settings", {
+  syncDuration: 2500,
+});
+
 // State is the current state of the user. It stays up to date by handling every
 // new sync response.
 export type State = {

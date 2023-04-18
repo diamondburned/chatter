@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import { token, sync } from "#/lib/frontend/state.js";
+  import { token, sync, settings } from "#/lib/frontend/state.js";
   import * as svelte from "svelte";
 
   import Room from "#/routes/room/[id]/+page.svelte";
@@ -14,7 +14,7 @@
     async function start() {
       if (!stop) {
         await sync();
-        window.setTimeout(start, 2500);
+        window.setTimeout(start, $settings.syncDuration);
       }
     }
     start();
@@ -22,4 +22,4 @@
   });
 </script>
 
-<Room data={{}} />
+<Room data={{ roomID: "" }} />

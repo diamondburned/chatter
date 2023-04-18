@@ -6,6 +6,7 @@
   import Icon from "#/components/Icon.svelte";
   import Modal from "#/components/Modal.svelte";
   import Symbol from "#/components/Symbol.svelte";
+  import Settings from "#/components/Sidebar/Settings.svelte";
   import RoomItem from "#/components/Sidebar/RoomItem.svelte";
   import RoomSearchDialog from "#/components/Sidebar/RoomSearchDialog.svelte";
   import RoomCreateDialog from "#/components/Sidebar/RoomCreateDialog.svelte";
@@ -120,6 +121,10 @@
 
 {#if showCreateRoom}
   <RoomCreateDialog bind:open={showCreateRoom} />
+{/if}
+
+{#if showSettings}
+  <Settings bind:open={showSettings} />
 {/if}
 
 <!-- <dialog id="settings" open={showSettings} /> -->

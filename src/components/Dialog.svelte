@@ -71,14 +71,7 @@
   .contents {
     flex: 1;
     overflow: hidden;
+    margin: 0.35rem 1rem;
+    padding: 0;
   }
-
-  /*
-  .contents {
-    & > :global(h1),
-    & > :global(h2) {
-      border-bottom: 1px solid $picnic-dull;
-    }
-  }
-  */
 </style>
