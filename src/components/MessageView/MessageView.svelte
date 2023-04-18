@@ -149,9 +149,13 @@
   div.messages {
     height: 100%;
     flex: 1;
+    padding-bottom: 0.5em;
 
     display: flex;
     flex-direction: column-reverse;
+
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   footer form {
