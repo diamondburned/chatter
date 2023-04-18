@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "vite --clearScreen=false",
-    "build": "vite build",
+    "build": "npm run prisma && vite build",
     "prisma": "prisma format --schema ./src/lib/db/schema.prisma && prisma generate --schema ./src/lib/db/schema.prisma",
     "prisma-reset-prod": "prisma db push --schema ./src/lib/db/schema.prisma",
     "test": "vitest --run"
