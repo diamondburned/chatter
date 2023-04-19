@@ -52,17 +52,24 @@ export async function authorize(request: Request): Promise<prisma.Session> {
     throw new Error("missing Authorization header");
   }
 
-  const oldSession = await client.session.findFirstOrThrow({
+  const session = await client.session.findFirstOrThrow({
     where: {
       token: request.headers.get("Authorization"),
       expiresAt: { gt: new Date() },
     },
   });
 
-  return await client.session.update({
-    where: { id: oldSession.id },
-    data: { expiresAt: new Date(Date.now() + SessionMaxAge) },
-  });
+  // Only update if we're within 1/4 of the session's max age.
+  if (session.expiresAt.getTime() - Date.now() < SessionMaxAge / 4) {
+    return await client.session.update({
+      where: { id: session.id },
+      data: {
+        expiresAt: new Date(Date.now() + SessionMaxAge),
+      },
+    });
+  }
+
+  return session;
 }
 
 // joinRoom tacks the user into the room if they're not already in it.
