@@ -26,7 +26,6 @@
     inner?: string | HTMLElement,
     attrs?: Record<string, string>
   ): HTMLElement {
-    console.log(tag, inner, attrs);
     const el = document.createElement(tag);
     if (inner) {
       el.append(inner);
@@ -134,11 +133,13 @@
   export let event: Extract<api.RoomEvent, { type: "message_create" }>;
 
   let p: HTMLElement | undefined;
+  let prev: string;
   $: {
-    if (p) {
+    if (p && prev != event.content.markdown) {
       const ast = parser(event.content.markdown, { inline: true });
       const out = renderer(ast, { event });
       p.replaceChildren(out);
+      prev = event.content.markdown;
     }
   }
 </script>
