@@ -57,6 +57,52 @@ export const state = persistent.writable<State>("chatter_state", {
   events: {},
 });
 
+class SyncController {
+  stopped: boolean = false;
+  timeout: number | null = null;
+
+  constructor() {}
+
+  start() {
+    this.stopped = false;
+
+    const { syncDuration } = store.get(settings);
+    const schedule = async () => {
+      if (this.stopped) {
+        return;
+      }
+
+      try {
+        await sync();
+      } catch (err) {
+        console.error("cannot background sync", err);
+      }
+
+      this.timeout = window.setTimeout(schedule, syncDuration);
+    };
+
+    schedule();
+  }
+
+  stop() {
+    this.stopped = true;
+
+    if (this.timeout) {
+      window.clearTimeout(this.timeout);
+      this.timeout = null;
+    }
+  }
+
+  restart() {
+    this.stop();
+    this.start();
+  }
+}
+
+const syncController = new SyncController();
+syncController.start();
+settings.subscribe(() => syncController.restart()); // interval might've changed
+
 // updateState updates the state with the given sync response.
 export function updateState(s: State, sync: api.OKResponse<api.SyncResponse>) {
   s.ack = sync.ack;
@@ -72,6 +118,12 @@ export async function sync(
   s: store.Writable<State> = state,
   tok = store.get(token)
 ) {
+  if (!tok) {
+    // If there's no token, then we can't sync. Don't error out, since this
+    // might be a background sync.
+    return;
+  }
+
   const lastAck = store.get(s).ack;
 
   const headers = new Headers();
