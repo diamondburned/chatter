@@ -209,3 +209,10 @@ export type SyncResponse = FailableResponse<{
   // messages, the client should send a RoomEventsRequest.
   events: Record<string, api.RoomEvent[]>;
 }>;
+
+// UploadAssetResponse is the response to an upload asset request.
+export type UploadAssetResponse = FailableResponse<{
+  hash: string;
+  type: string;
+  size: number;
+}>;

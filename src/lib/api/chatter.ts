@@ -19,6 +19,7 @@ export function DateFromID(id: string): Date {
 export type Resource =
   | `http://${string}`
   | `https://${string}`
+  | `asset://${string}` // specifically for uploaded assets, asset://hash
   | `data:${string};base64,${string}`;
 
 // Color is a color in the form of #RRGGBB.

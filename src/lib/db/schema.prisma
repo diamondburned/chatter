@@ -17,6 +17,7 @@ model User {
   ownsRooms   Room[]       @relation("RoomOwner")
   events      Event[]
   attributes  Json         @default("{}")
+  assets      AssetRef[]
 }
 
 model Session {
@@ -55,6 +56,23 @@ model Event {
   author   User?     @relation(fields: [authorID], references: [id])
   authorID String?
   content  Json      @default("{}")
+}
+
+model Asset {
+  hash String     @id
+  type String
+  data Bytes
+  time DateTime   @default(now())
+  refs AssetRef[]
+}
+
+model AssetRef {
+  user      User   @relation(fields: [userID], references: [id], onDelete: Cascade)
+  userID    String
+  asset     Asset  @relation(fields: [assetHash], references: [hash], onDelete: Cascade)
+  assetHash String
+
+  @@id([userID, assetHash])
 }
 
 enum EventType {

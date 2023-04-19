@@ -7,7 +7,9 @@ import type * as api from "#/lib/api/index.js";
 
 export { Prisma } from "@prisma/client";
 export { prisma };
-export const client = new prisma.PrismaClient();
+export const client = new prisma.PrismaClient({
+  log: ["query"],
+});
 
 export async function comparePassword(
   userPasshash: Buffer,
@@ -98,6 +100,20 @@ export async function joinRoom(session: prisma.Session, roomID: string) {
     }
     throw err; // pretty bad
   }
+}
+
+// cleanupAssets drops all assets with no references, because Prisma doesn't
+// have database triggers.
+export async function cleanupAssets(): Promise<prisma.Prisma.BatchPayload> {
+  const expiry = 1000 * 60 * 60 * 24; // 1 day
+  return await client.asset.deleteMany({
+    where: {
+      // I think this works. The debugged query basically translates to "delete
+      // all assets that has no references."
+      refs: { none: {} },
+      time: { lt: new Date(Date.now() - expiry) },
+    },
+  });
 }
 
 export function convertUser(user: prisma.User): api.User {

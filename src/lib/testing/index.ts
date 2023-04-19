@@ -91,6 +91,15 @@ export class APITester {
     return this.do("DELETE", path, {}, body, expect, expect === ExpectError);
   }
 
+  fromPath(path: string, params?: Record<string, string>): string {
+    const url = new URL(this.url);
+    url.pathname = path;
+    if (params) {
+      url.search = params.toString();
+    }
+    return url.toString();
+  }
+
   private async do<T>(
     method: string,
     path: string,
@@ -99,15 +108,7 @@ export class APITester {
     expect: T | undefined,
     expectError: boolean
   ): Promise<T | api.ErrorResponse> {
-    const url = new URL(this.url);
-    url.pathname = path;
-
-    if (params) {
-      const searchParams = new URLSearchParams(params);
-      url.search = searchParams.toString();
-    }
-
-    const resp = await fetch(url.toString(), {
+    const resp = await fetch(this.fromPath(path, params), {
       body: method != "GET" ? JSON.stringify(requestBody) : undefined,
       method: method,
       headers: this.headers,

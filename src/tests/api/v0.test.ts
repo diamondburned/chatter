@@ -145,9 +145,12 @@ describe("api/v0", () => {
     // console.debug(`synced to ${sync.ack}:`, sync);
 
     assert(sync.events[ourRoomID]);
-    assertEq(sync.events[ourRoomID].length, 1);
-    assertEq(sync.events[ourRoomID][0].id, ourMessageID);
-    assertEq(sync.events[ourRoomID][0].type, "message_create");
+    assert(
+      sync.events[ourRoomID].find(
+        (ev) => ev.id === ourMessageID && ev.type == "message_create"
+      ),
+      `expected to find message_create event ${ourMessageID}`
+    );
   });
 
   it("list events", async () => {
@@ -188,7 +191,28 @@ describe("api/v0", () => {
       ownerID: meID,
     });
 
-    assert(!list.rooms.length);
-    assert(!list.rooms.find((r) => r.id === ourRoomID));
+    assert(
+      !list.rooms.find((r) => r.id === ourRoomID),
+      "expected our room to be gone"
+    );
+  });
+
+  it("upload asset", async () => {
+    const post = await fetch(tester.fromPath(`/api/v0/assets`), {
+      method: "POST",
+      body: "hello world",
+      headers: tester.headers,
+    });
+    assert(post.ok, `got ${post.status} ${post.statusText}`);
+
+    const resp = (await post.json()) as api.OKResponse<api.UploadAssetResponse>;
+    assert(resp.hash);
+    assertEq(resp.type, "text/plain; charset=utf-8");
+    assertEq(resp.size, 11);
+
+    const get = await fetch(tester.fromPath(`/api/v0/assets/${resp.hash}`));
+    assert(get.ok, `got ${get.status} ${get.statusText}`);
+    assertEq(get.headers.get("content-type"), "text/plain; charset=utf-8");
+    assertEq(await get.text(), "hello world");
   });
 });

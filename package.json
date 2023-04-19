@@ -10,11 +10,14 @@
     "test": "vitest --run"
   },
   "dependencies": {
+    "@netlify/functions": "^1.4.0",
     "@prisma/client": "^4.2.1",
     "@sveltejs/adapter-auto": "^2.0.0",
     "@sveltejs/kit": "^1.15.5",
     "bcryptjs": "^2.4.3",
+    "detect-content-type": "^1.2.0",
     "discord-markdown-parser": "^1.1.0",
+    "mime-types": "^2.1.35",
     "normalize.css": "^8.0.1",
     "picnic": "^7.1.0",
     "sass": "^1.60.0",
@@ -31,7 +34,7 @@
     "@types/node": "^18.14.0",
     "prettier": "^2.8.4",
     "prettier-plugin-svelte": "^2.10.0",
-    "prisma": "^4.2.1",
+    "prisma": "^4.12.0",
     "svelte-language-server": "^0.15.9",
     "ts-node": "^10.9.1",
     "vitest": "^0.28.5"
