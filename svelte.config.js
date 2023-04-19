@@ -4,7 +4,9 @@ import { vitePreprocess } from "@sveltejs/kit/vite";
 const config = {
   preprocess: vitePreprocess(),
   kit: {
-    adapter: netlify(),
+    adapter: netlify({
+      split: true,
+    }),
   },
 };
 
