@@ -58,17 +58,24 @@ export const state = persistent.writable<State>("chatter_state", {
 });
 
 class SyncController {
-  stopped: boolean = false;
-  timeout: number | null = null;
+  private stopFunc = () => {};
 
   constructor() {}
 
   start() {
-    this.stopped = false;
+    let stopped = false;
+    let timeout: number | null = null;
+    this.stopFunc = () => {
+      stopped = true;
+      if (timeout) {
+        window.clearTimeout(timeout);
+        timeout = null;
+      }
+    };
 
     const { syncDuration } = store.get(settings);
     const schedule = async () => {
-      if (this.stopped) {
+      if (stopped) {
         return;
       }
 
@@ -78,19 +85,14 @@ class SyncController {
         console.error("cannot background sync", err);
       }
 
-      this.timeout = window.setTimeout(schedule, syncDuration);
+      timeout = window.setTimeout(schedule, syncDuration);
     };
 
     schedule();
   }
 
   stop() {
-    this.stopped = true;
-
-    if (this.timeout) {
-      window.clearTimeout(this.timeout);
-      this.timeout = null;
-    }
+    this.stopFunc();
   }
 
   restart() {
