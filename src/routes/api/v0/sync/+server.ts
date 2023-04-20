@@ -44,7 +44,6 @@ export async function GET(ev: sveltekit.ServerLoadEvent): Promise<Response> {
     if (joinedRoomIDs.length > 0) {
       const eventsQuery = await db.client.$queryRaw<
         (db.prisma.Event & {
-          userID: db.prisma.User["id"];
           username: db.prisma.User["username"];
           userAttributes: db.prisma.User["attributes"];
         })[]
@@ -56,7 +55,6 @@ export async function GET(ev: sveltekit.ServerLoadEvent): Promise<Response> {
         LEFT JOIN LATERAL (
           SELECT 
             public."Event".*, 
-            public."User"."id" AS "userID", 
             public."User"."username" AS "username", 
             public."User"."attributes" AS "userAttributes" 
           FROM 
@@ -64,24 +62,26 @@ export async function GET(ev: sveltekit.ServerLoadEvent): Promise<Response> {
           INNER JOIN public."User" ON public."User"."id" = public."Event"."authorID" 
           WHERE 
             public."Event"."roomID" = "matchingID" AND
-	  	  public."Event"."id" > ${lastAck} AND
-	  	  public."Event"."id" <= ${ack}
+            public."Event"."id" > ${lastAck} AND
+            public."Event"."id" <= ${ack}
           ORDER BY 
             public."Event"."id" DESC 
           LIMIT 
             100
         ) AS subquery ON true;
-	`;
+      `;
 
       joinedRoomsQuery.forEach((r) => {
-        events[r.id] = eventsQuery.map((e) =>
-          db.convertEvent(e, {
-            id: e.userID,
-            username: e.username,
-            passhash: null,
-            attributes: e.userAttributes,
-          })
-        );
+        events[r.id] = eventsQuery
+          .filter((e) => !!e.id) // no event for the current room
+          .map((e) =>
+            db.convertEvent(e, {
+              id: e.authorID,
+              username: e.username,
+              passhash: null,
+              attributes: e.userAttributes,
+            })
+          );
       });
     }
 
