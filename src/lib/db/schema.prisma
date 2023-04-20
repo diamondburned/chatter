@@ -18,6 +18,8 @@ model User {
   events      Event[]
   attributes  Json         @default("{}")
   assets      AssetRef[]
+
+  @@index([id], type: Hash)
 }
 
 model Session {
@@ -26,6 +28,8 @@ model Session {
   user      User     @relation(fields: [userID], references: [id], onDelete: Cascade)
   userID    String
   expiresAt DateTime
+
+  @@index([token], type: Hash)
 }
 
 model Room {
@@ -36,6 +40,9 @@ model Room {
   members    RoomMember[] @relation("RoomMember")
   events     Event[]
   attributes Json         @default("{}")
+
+  @@index([ownerID])
+  @@index([id], type: Hash)
 }
 
 model RoomMember {
@@ -49,13 +56,16 @@ model RoomMember {
 }
 
 model Event {
-  id       String    @id
+  id       String @id
   type     EventType
   room     Room      @relation(fields: [roomID], references: [id], onDelete: Cascade)
   roomID   String
   author   User?     @relation(fields: [authorID], references: [id])
   authorID String?
   content  Json      @default("{}")
+
+  @@index([id(order: Desc)], type: BTree)
+  @@index([roomID])
 }
 
 model Asset {
@@ -64,6 +74,8 @@ model Asset {
   data Bytes
   time DateTime   @default(now())
   refs AssetRef[]
+
+  @@index([hash], type: Hash)
 }
 
 model AssetRef {

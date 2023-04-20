@@ -8,8 +8,13 @@ import type * as api from "#/lib/api/index.js";
 export { Prisma } from "@prisma/client";
 export { prisma };
 export const client = new prisma.PrismaClient({
-  log: ["query"],
+  // log: [{ emit: "event", level: "query" }],
 });
+
+// client.$on("query", (e) => {
+//   console.log(`[${e.duration}ms]`, e.query);
+//   console.log(e.params);
+// });
 
 export async function comparePassword(
   userPasshash: Buffer,

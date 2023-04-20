@@ -20,48 +20,72 @@ export async function GET(ev: sveltekit.ServerLoadEvent): Promise<Response> {
     const now = Date.now();
     const ack = db.newID(now);
 
-    console.log(`syncing: ${lastAck} <= x <= ${now}`);
+    // console.log("=======");
+    // console.log(`syncing: ${lastAck} <= x <= ${ack}`);
+    // console.log("=======");
 
-    const user = await db.client.user.findUniqueOrThrow({
+    let user = await db.client.user.findUniqueOrThrow({
       where: { id: session.userID },
-      include: {
-        ownsRooms: {
-          include: {
-            owner: true,
-          },
-        },
-        joinedRooms: {
-          select: {
-            room: {
-              include: {
-                owner: true,
-                events: {
-                  take: 100,
-                  where: {
-                    id: {
-                      gte: lastAck,
-                      lte: ack,
-                    },
-                  },
-                  orderBy: { id: "desc" },
-                  include: { author: true },
-                },
-              },
-            },
-          },
-        },
-      },
     });
 
-    const joinedRooms = user.joinedRooms
-      .map((m) => m.room)
-      .map((r) => db.convertRoom(r, r.owner));
-    const ownsRooms = user.ownsRooms.map((r) => db.convertRoom(r, r.owner));
+    const ownsRoomsQuery = await db.client.room.findMany({
+      where: { ownerID: session.userID },
+    });
+    const ownsRooms = ownsRoomsQuery.map((r) => db.convertRoom(r, user));
+
+    const joinedRoomsQuery = await db.client.room.findMany({
+      where: { members: { some: { userID: session.userID } } },
+      include: { owner: true },
+    });
+    const joinedRooms = joinedRoomsQuery.map((r) => db.convertRoom(r, r.owner));
+    const joinedRoomIDs = joinedRooms.map((r) => r.id);
 
     const events: Record<string, api.RoomEvent[]> = {};
-    for (const { room } of user.joinedRooms) {
-      events[room.id] = room.events.map((ev) => db.convertEvent(ev, ev.author));
+    if (joinedRoomIDs.length > 0) {
+      const eventsQuery = await db.client.$queryRaw<
+        (db.prisma.Event & {
+          userID: db.prisma.User["id"];
+          username: db.prisma.User["username"];
+          userAttributes: db.prisma.User["attributes"];
+        })[]
+      >`
+        SELECT 
+          * 
+        FROM 
+          unnest(ARRAY[${db.Prisma.join(joinedRoomIDs)}]) AS "matchingID" 
+        LEFT JOIN LATERAL (
+          SELECT 
+            public."Event".*, 
+            public."User"."id" AS "userID", 
+            public."User"."username" AS "username", 
+            public."User"."attributes" AS "userAttributes" 
+          FROM 
+            public."Event" 
+          INNER JOIN public."User" ON public."User"."id" = public."Event"."authorID" 
+          WHERE 
+            public."Event"."roomID" = "matchingID" AND
+	  	  public."Event"."id" > ${lastAck} AND
+	  	  public."Event"."id" <= ${ack}
+          ORDER BY 
+            public."Event"."id" DESC 
+          LIMIT 
+            100
+        ) AS subquery ON true;
+	`;
+
+      joinedRoomsQuery.forEach((r) => {
+        events[r.id] = eventsQuery.map((e) =>
+          db.convertEvent(e, {
+            id: e.userID,
+            username: e.username,
+            passhash: null,
+            attributes: e.userAttributes,
+          })
+        );
+      });
     }
+
+    // console.log("======= CUT HERE =======");
 
     const sync: api.SyncResponse = {
       me: {

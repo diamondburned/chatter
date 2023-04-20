@@ -95,7 +95,8 @@ export class APITester {
     const url = new URL(this.url);
     url.pathname = path;
     if (params) {
-      url.search = params.toString();
+      const searchParams = new URLSearchParams(params);
+      url.search = searchParams.toString();
     }
     return url.toString();
   }

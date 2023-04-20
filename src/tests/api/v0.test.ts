@@ -110,16 +110,22 @@ describe("api/v0", () => {
       lastAck,
     });
     lastAck = sync.ack;
-    // console.debug(`synced to ${sync.ack}:`, sync);
+    console.debug(`synced to ${sync.ack}:`, sync);
 
-    assert(sync.events[ourRoomID]);
+    assert(sync.events[ourRoomID], "no events for our room");
     assertEq(sync.events[ourRoomID].length, 1);
 
-    assert(sync.me.ownsRooms.length > 0);
-    assert(sync.me.ownsRooms.find((r) => r.id == ourRoomID));
+    assert(sync.me.ownsRooms.length > 0, "no owned rooms");
+    assert(
+      sync.me.ownsRooms.find((r) => r.id == ourRoomID),
+      "no our owned room"
+    );
 
-    assert(sync.me.joinedRooms.length > 0);
-    assert(sync.me.joinedRooms.find((r) => r.id == ourRoomID));
+    assert(sync.me.joinedRooms.length > 0, "no joined rooms");
+    assert(
+      sync.me.joinedRooms.find((r) => r.id == ourRoomID),
+      "no our joined room"
+    );
   });
 
   it("send message event", async () => {
@@ -144,7 +150,7 @@ describe("api/v0", () => {
     lastAck = sync.ack;
     // console.debug(`synced to ${sync.ack}:`, sync);
 
-    assert(sync.events[ourRoomID]);
+    assert(sync.events[ourRoomID], "no events for our room");
     assert(
       sync.events[ourRoomID].find(
         (ev) => ev.id === ourMessageID && ev.type == "message_create"
