@@ -289,6 +289,7 @@
       margin: 0;
 
       line-height: 1;
+      text-align: left;
       font-size: 0.85em;
 
       overflow: hidden;

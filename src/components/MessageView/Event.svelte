@@ -82,16 +82,21 @@
     }
 
     .lhs {
-      --size: 2.25em;
+      --size: 2.5em;
       width: var(--size);
 
       display: flex;
       align-items: baseline;
       justify-content: flex-end;
+
+      @media (max-width: $mobile-width) {
+        --size: 2.25em;
+      }
     }
 
     .rhs {
       flex: 1;
+      overflow: hidden;
 
       display: flex;
       flex-direction: column;
@@ -110,8 +115,12 @@
 
     line-height: 1;
 
-    p:empty {
-      display: none;
+    p {
+      flex: 1;
+
+      &:empty {
+        display: none;
+      }
     }
 
     span.author {
@@ -121,6 +130,7 @@
 
   time {
     margin-left: auto;
+    text-align: right;
     font-size: 0.75em;
     opacity: 0.75;
   }

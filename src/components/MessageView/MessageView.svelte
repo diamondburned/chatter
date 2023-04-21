@@ -128,12 +128,18 @@
 </script>
 
 <header>
-  <Icon url={room.attributes.avatar} name={room.name} symbol="chat_bubble" />
+  <slot name="header-start" />
+  <div class="icon">
+    <Icon url={room.attributes.avatar} name={room.name} symbol="chat_bubble" />
+  </div>
   <div class="info">
     <h2>{room.name}</h2>
     {#if room.attributes.topic}
       <p class="topic">{room.attributes.topic}</p>
     {/if}
+  </div>
+  <div class="right">
+    <slot name="header-end" />
   </div>
 </header>
 
@@ -166,15 +172,27 @@
     display: flex;
     align-items: center;
     gap: 0.5em;
-    margin: 0.5em;
+    margin: 0.25em 0.5em;
 
     .info {
       font-size: 0.8em;
+      overflow: hidden;
+
       h2,
       p {
         margin: 0;
         padding: 0;
         line-height: 1.2;
+
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+    }
+
+    @media (max-width: $mobile-width) {
+      .icon {
+        display: none;
       }
     }
   }
@@ -182,19 +200,22 @@
   div.messages {
     height: 100%;
     flex: 1;
-    padding-bottom: 0.5em;
+    padding-bottom: 1em;
 
     display: flex;
     flex-direction: column-reverse;
 
-    overflow-y: auto;
     overflow-x: hidden;
+    overflow-y: auto;
   }
 
   footer form {
+    --margin: 0.5em;
+
     display: flex;
-    margin: 0.5em;
-    gap: 0.5em;
+    margin: var(--margin);
+    margin-top: 0;
+    gap: var(--margin);
 
     button {
       padding: 0.35em 0.5em;
@@ -204,6 +225,10 @@
     textarea.multiline {
       height: 5em;
       scrollbar-width: thin;
+    }
+
+    @media (max-width: $mobile-width) {
+      --margin: 0.25em;
     }
   }
 </style>

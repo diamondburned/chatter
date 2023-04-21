@@ -150,6 +150,7 @@
   p {
     margin: 0;
     white-space: pre-wrap;
+    overflow: hidden;
 
     :global(code) {
       padding: 0;
@@ -159,6 +160,8 @@
 
     :global(pre) {
       margin: 0.25em 0;
+      overflow: auto;
+      scrollbar-width: thin;
     }
   }
 </style>
