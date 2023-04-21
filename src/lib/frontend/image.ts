@@ -1,4 +1,5 @@
-import type * as api from "#/lib/api/index.js";
+import * as api from "#/lib/api/index.js";
+import { getToken } from "#/lib/frontend/state.js";
 
 const elementID = "frontend-image-preview";
 
@@ -25,6 +26,7 @@ export async function compressImage(
     quality = 0.7,
     maxWidth = null,
     maxHeight = null,
+    resource = "asset" as "dataURL" | "asset",
   }
 ): Promise<api.Resource | undefined> {
   // read all file
@@ -63,14 +65,39 @@ export async function compressImage(
   }
 
   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  let dataURL: string | undefined = canvas.toDataURL(targetMIME, quality);
-  if (dataURL == "data:,") {
-    dataURL = undefined;
+
+  let result: api.Resource | undefined;
+
+  switch (resource) {
+    case "dataURL": {
+      let dataURL: string | undefined = canvas.toDataURL(targetMIME, quality);
+      if (dataURL == "data:,") {
+        throw new Error("failed to compress image");
+      }
+      result = dataURL as api.Resource;
+      break;
+    }
+    case "asset": {
+      const blob = await new Promise<Blob | null>((resolve) => {
+        canvas.toBlob(resolve, targetMIME, quality);
+      });
+      if (!blob) {
+        throw new Error("failed to compress image");
+      }
+      const resp = await api.request<api.UploadAssetResponse>(
+        "/api/v0/assets",
+        {
+          method: "POST",
+          body: blob,
+          headers: { Authorization: getToken() },
+        }
+      );
+      result = `asset://${resp.hash}`;
+    }
   }
 
   preview.removeChild(canvas);
-
-  return dataURL as api.Resource | undefined;
+  return result;
 }
 
 export async function compressAvatar(
@@ -81,5 +108,6 @@ export async function compressAvatar(
     quality: 0.7,
     maxWidth: 128,
     maxHeight: 128,
+    resource: "asset",
   });
 }

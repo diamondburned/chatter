@@ -15,7 +15,7 @@
     try {
       const data = new FormData(ev.target as HTMLFormElement);
       const body: api.UpdateUserRequest = {
-        username: data.has("username")
+        username: data.get("username")
           ? (data.get("username") as string)
           : undefined,
         attributes: {

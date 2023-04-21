@@ -52,6 +52,15 @@ export type State = {
 // token stores the user's token persistently.
 export const token = persistent.writable<string | null>("chatter_token", null);
 
+// getToken returns the user's token. If the token is not set, it throws.
+export function getToken(): string {
+  const t = store.get(token);
+  if (!t) {
+    throw new Error("token not set");
+  }
+  return t;
+}
+
 // state contains the current state of the user.
 export const state = persistent.writable<State>("chatter_state", {
   events: {},

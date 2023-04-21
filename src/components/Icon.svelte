@@ -11,6 +11,11 @@
   export let size: string | null = null;
 
   $: alt = avatar ? `${name} avatar` : `${name} icon`;
+  $: src = url
+    ? url.startsWith("asset://")
+      ? `/api/v0/assets/${url.replace("asset://", "")}`
+      : url
+    : null;
 
   function initials(name: string): string {
     return name
@@ -21,13 +26,13 @@
   }
 </script>
 
-{#if url}
+{#if src}
   <img
     class="icon"
     class:inline
     class:avatar
     class:emoji
-    src={url}
+    {src}
     {alt}
     style="--size: {size}"
   />
