@@ -1,5 +1,6 @@
 <script lang="ts">
   import { state } from "#/lib/frontend/state.js";
+  import { onMount } from "svelte";
 
   import Modal from "#/components/Modal.svelte";
   import Sidebar from "#/components/Sidebar/Sidebar.svelte";
@@ -14,6 +15,10 @@
   $: room = $state.me
     ? $state.me.joinedRooms.find((room) => room.id == data.roomID)
     : null;
+
+  onMount(() => {
+    document.title = room ? `${room.name} — chatter` : "chatter";
+  });
 </script>
 
 <div class="room-page" class:has-room={!!room}>
