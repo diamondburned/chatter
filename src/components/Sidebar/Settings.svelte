@@ -14,21 +14,29 @@
 
     try {
       const data = new FormData(ev.target as HTMLFormElement);
+
+      const attributes = await Promise.all(
+        Array.from(data.entries())
+          .filter(([key]) => key.startsWith("attributes."))
+          .map(async ([key, value]) => {
+            key = key.replace(/^attributes\./, "");
+            if (typeof value == "string") {
+              // ok
+            } else if (value instanceof File) {
+              value = await compressAvatar(value);
+            } else {
+              throw new Error(`Invalid value for ${key}`);
+            }
+            return [key.replace(/^attributes\./, ""), value];
+          })
+      );
+
       const body: api.UpdateUserRequest = {
         username: data.get("username")
           ? (data.get("username") as string)
           : undefined,
-        attributes: {
-          avatar: await (async () => {
-            const file = data.get("avatar") as File;
-            if (!file || file.size == 0) {
-              return undefined; // no actual file, size=0 is a valid case???
-            }
-            return await compressAvatar(file);
-          })(),
-        },
+        attributes: Object.fromEntries(attributes),
       };
-      console.log(body);
 
       await api.request("/api/v0/users/me", {
         method: "PATCH",
@@ -77,7 +85,7 @@
           placeholder="(unchanged)"
         />
         <label for="avatar">Avatar</label>
-        <input type="file" name="avatar" id="avatar" />
+        <input type="file" name="attributes.avatar" id="avatar" />
       </formset>
       <button type="submit" disabled={savingUserSettings}>Save</button>
     </form>
