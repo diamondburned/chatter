@@ -5,7 +5,7 @@ const config = {
   preprocess: vitePreprocess(),
   kit: {
     adapter: netlify({
-      split: true,
+      // split: true,
     }),
   },
 };
