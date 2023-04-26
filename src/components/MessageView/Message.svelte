@@ -4,6 +4,7 @@
 
   import * as simplemarkdown from "simple-markdown";
   import * as discordmarkdown from "discord-markdown-parser";
+  import twitchEmojis from "#/lib/twitch-emojis.json";
 
   type outputFn = simplemarkdown.NodeOutput<HTMLElement | string>;
 
@@ -107,6 +108,31 @@
         return w("a", elem(node.content, state), { href, target: "_blank" });
       },
     },
+    emoji: {
+      order: simplemarkdown.defaultRules.strong.order,
+      match: (source) => {
+        const capture = source.match(/^:(\w+):/);
+        if (capture && twitchEmojis[capture[1]]) {
+          return capture;
+        }
+        return null;
+      },
+      parse: (capture) => {
+        const name = capture[1];
+        return {
+          name,
+          url: twitchEmojis[name],
+        };
+      },
+      elem: (node) => {
+        const img = document.createElement("img");
+        img.src = node.url;
+        img.alt = `${node.name} emoji`;
+        img.title = `:${node.name}:`;
+        img.classList.add("twitch-emoji");
+        return img;
+      },
+    },
   };
 
   const allRules = {
@@ -134,17 +160,21 @@
 
   let p: HTMLElement | undefined;
   let prev: string;
+  let onlyEmoji = false;
   $: {
     if (p && prev != event.content.markdown) {
       const ast = parser(event.content.markdown, { inline: true });
       const out = renderer(ast, { event });
       p.replaceChildren(out);
       prev = event.content.markdown;
+      // onlyEmoji is true if the rendered HTML has no text nodes at all.
+      // It's a pretty lazy way to check this.
+      onlyEmoji = out.textContent?.trim() == "";
     }
   }
 </script>
 
-<p class="markdown" bind:this={p} />
+<p class="markdown" class:only-emoji={onlyEmoji} bind:this={p} />
 
 <style lang="scss">
   p {
@@ -162,6 +192,21 @@
       margin: 0.25em 0;
       overflow: auto;
       scrollbar-width: thin;
+    }
+
+    :global(img.twitch-emoji) {
+      --size: 1.15em;
+      width: var(--size);
+      height: var(--size);
+      object-fit: contain;
+    }
+
+    &.only-emoji :global(img.twitch-emoji) {
+      --size: 2em;
+    }
+
+    &:not(.only-emoji) :global(img.twitch-emoji) {
+      vertical-align: middle;
     }
   }
 </style>
