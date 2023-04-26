@@ -43,6 +43,8 @@
 
   :global(dialog.dialog .modal) {
     width: clamp(300px, 75%, 600px);
+    height: initial;
+
     max-width: 100%;
     max-height: min(100%, 600px);
 
