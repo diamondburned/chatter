@@ -174,7 +174,9 @@
   }
 </script>
 
-<p class="markdown" class:only-emoji={onlyEmoji} bind:this={p} />
+{#key event.content.markdown}
+  <p class="markdown" class:only-emoji={onlyEmoji} bind:this={p} />
+{/key}
 
 <style lang="scss">
   p {

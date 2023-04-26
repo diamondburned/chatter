@@ -8,11 +8,17 @@
 
   export let room: api.Room;
 
-  let events: (api.RoomEvent & { compact: boolean })[];
-  $: {
+  let events: (api.RoomEvent & { compact: boolean })[] = [];
+  $: updateEvents($state.events[room.id] || []);
+
+  function updateEvents(rawEvents: api.RoomEvent[]) {
+    if (rawEvents[0] && events[0] && rawEvents[0].id == events[0].id) {
+      // No new events, so keep the old ones.
+      return;
+    }
+
     events = [];
 
-    const rawEvents = $state.events[room.id] || [];
     for (let i = 0; i < rawEvents.length; i++) {
       const event = rawEvents[i];
       switch (event.type) {
@@ -52,8 +58,6 @@
         compact: false,
       });
     }
-
-    console.log(events);
   }
 
   let textarea: HTMLTextAreaElement;
@@ -145,7 +149,9 @@
 
 <div class="messages">
   {#each events as event}
-    <Event {event} compact={event.compact} />
+    {#key event.id}
+      <Event {event} compact={event.compact} />
+    {/key}
   {/each}
 </div>
 
