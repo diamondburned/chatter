@@ -112,6 +112,7 @@ class SyncController {
 
 const syncController = new SyncController();
 syncController.start();
+token.subscribe(() => syncController.restart()); // token might've changed
 settings.subscribe(() => syncController.restart()); // interval might've changed
 
 // updateState updates the state with the given sync response.

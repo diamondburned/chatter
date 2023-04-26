@@ -17,6 +17,7 @@
     } catch (err) {
       if (err instanceof api.HTTPError && err.code == 401) {
         // 401 Unauthorized, go back to login
+        $token = null;
         goto("/login");
       } else {
         addToast("error", `Sync error: ${err}`);
