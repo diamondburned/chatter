@@ -38,7 +38,7 @@ export type Settings = {
 };
 
 export const settings = persistent.writable<Settings>("chatter_settings", {
-  syncDuration: 2500,
+  syncDuration: 5000,
 });
 
 // State is the current state of the user. It stays up to date by handling every
