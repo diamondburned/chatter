@@ -11,6 +11,18 @@ export function respondError(code: number, why: any, message = ""): Response {
   return new Response(JSON.stringify(body), { status: code });
 }
 
+// HTTPError is an error that can be thrown by request() to indicate an HTTP
+// or server error.
+export class HTTPError extends Error {
+  constructor(
+    text: string,
+    public readonly code: number,
+    public readonly server?: api.ErrorResponse
+  ) {
+    super(server ? server.error : `HTTP ${code}: ${text}`);
+  }
+}
+
 // request is a helper function to invoke a fetch() request.
 export async function request<T extends FailableResponse<any>>(
   path: string,
@@ -19,7 +31,7 @@ export async function request<T extends FailableResponse<any>>(
   const resp = await fetch(path, init);
   const die = (err?) => {
     if (!resp.ok) {
-      throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+      throw new HTTPError(resp.statusText, resp.status);
     }
     throw err;
   };
@@ -28,7 +40,7 @@ export async function request<T extends FailableResponse<any>>(
   if (!resp.ok) {
     const err = body as api.ErrorResponse;
     if (err.error) {
-      throw err.error;
+      throw new HTTPError(resp.statusText, resp.status, err);
     }
     die();
   }
