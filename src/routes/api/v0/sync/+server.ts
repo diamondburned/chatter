@@ -13,10 +13,7 @@ export async function GET(ev: sveltekit.ServerLoadEvent): Promise<Response> {
   }
 
   try {
-    const lastAck: string | undefined = url.searchParams.has("lastAck")
-      ? url.searchParams.get("lastAck")
-      : undefined;
-
+    const lastAck = url.searchParams.get("lastAck") ?? "";
     const now = Date.now();
     const ack = db.newID(now);
 
