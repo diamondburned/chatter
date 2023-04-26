@@ -73,7 +73,8 @@ export async function GET(ev: sveltekit.ServerLoadEvent): Promise<Response> {
 
       joinedRoomsQuery.forEach((r) => {
         events[r.id] = eventsQuery
-          .filter((e) => !!e.id) // no event for the current room
+          .filter((e) => e.id) // no event for the current room
+          .filter((e) => e.roomID === r.id) // only events for the current room
           .map((e) =>
             db.convertEvent(e, {
               id: e.authorID,
