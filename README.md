@@ -3,6 +3,19 @@
 A small chat server and application designed to be easily self-hostable by
 anyone using any free serverless hosting service (e.g., Vercel and Netlify).
 
+## Deploying
+
+You will need a PostgreSQL database instance. We use ElephantSQL for a
+free-tier PostgreSQL database instance, but you can use any PostgreSQL
+instance you want.
+
+### Netlify
+
+chatter officially supports Netlify out of the box. To deploy to Netlify, simply
+click the button below.
+
+[![Deploy to Netlify Button](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/diamondburned/chatter)
+
 ## Developing
 
 Before any development, you must have a `.env` or `.envrc` file in the root
