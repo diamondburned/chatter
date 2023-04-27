@@ -2,9 +2,10 @@ import type * as api from "#/lib/api/index.js";
 import { APITester, assert, assertEq } from "#/lib/testing/index.js";
 import { describe, it } from "vitest";
 
-const addr = process.env["TESTING_API"];
+let addr = process.env["TESTING_API"];
 if (!addr) {
-  throw new Error(`missing $TESTING_API address`);
+  console.log("using default API address (http://127.0.0.1:3000)");
+  addr = "127.0.0.1:3000";
 }
 
 const registrationSecret = process.env["REGISTRATION_SECRET"] || "";
