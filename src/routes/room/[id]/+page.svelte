@@ -1,6 +1,7 @@
 <script lang="ts">
   import { state } from "#/lib/frontend/state.js";
   import { onMount } from "svelte";
+  import { fade } from "svelte/transition";
 
   import Modal from "#/components/Modal.svelte";
   import Sidebar from "#/components/Sidebar/Sidebar.svelte";
@@ -29,11 +30,15 @@
   </div>
   <div class="message-view">
     {#if room}
-      <MessageView {room}>
-        <div slot="header-start" class="menu-button">
-          <ToggleButton symbol="menu" bind:open={revealSidebar} />
+      {#key room.id}
+        <div class="message-view-wrap" transition:fade={{ duration: 150 }}>
+          <MessageView {room}>
+            <div slot="header-start" class="menu-button">
+              <ToggleButton symbol="menu" bind:open={revealSidebar} />
+            </div>
+          </MessageView>
         </div>
-      </MessageView>
+      {/key}
     {:else}
       <div class="placeholder">
         <span class="brand">chatter</span>
@@ -99,6 +104,15 @@
         p {
           margin-top: 0.5em;
         }
+      }
+
+      .message-view-wrap {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+
+        display: flex;
+        flex-direction: column;
       }
     }
   }
